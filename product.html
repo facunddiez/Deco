@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sofá Osaka — Aura Home</title>
+  <meta name="description" content="Sofá Osaka de tres cuerpos. Tela bouclé, patas de roble. Diseño escandinavo para living." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+  <!-- NAV (versión sin hero: siempre sólida) -->
+  <nav class="nav scrolled" id="mainNav" style="position:sticky;">
+    <div class="container">
+      <div class="nav__inner">
+
+        <a href="index.html" class="nav__logo">
+          Aura Home
+          <span>Design & Interiors</span>
+        </a>
+
+        <ul class="nav__menu">
+          <li><a href="index.html" class="nav__link">Inicio</a></li>
+          <li><a href="index.html#productos" class="nav__link active">Productos</a></li>
+          <li><a href="index.html#nosotros" class="nav__link">Nosotros</a></li>
+          <li><a href="#" class="nav__link">Proyectos</a></li>
+          <li><a href="#" class="nav__link">Contacto</a></li>
+        </ul>
+
+        <div class="nav__actions">
+          <button class="btn-icon" aria-label="Buscar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+          <button class="btn-icon cart-btn" id="cartToggle" aria-label="Carrito">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
+          <button class="nav__burger" id="menuToggle" aria-label="Menú">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <div class="nav__overlay" id="navOverlay"></div>
+  <nav class="nav__drawer" id="navDrawer">
+    <a href="index.html" class="nav__link">Inicio</a>
+    <a href="index.html#productos" class="nav__link active">Productos</a>
+    <a href="index.html#nosotros" class="nav__link">Nosotros</a>
+    <a href="#" class="nav__link">Proyectos</a>
+    <a href="#" class="nav__link">Contacto</a>
+  </nav>
+
+  <!-- PRODUCT DETAIL -->
+  <main class="product-detail">
+    <div class="container">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="index.html">Inicio</a>
+        <span class="breadcrumb__sep">›</span>
+        <a href="index.html#productos">Muebles</a>
+        <span class="breadcrumb__sep">›</span>
+        <span>Sofá Osaka</span>
+      </nav>
+
+      <div class="product-detail__layout">
+
+        <!-- ===================== GALERÍA ===================== -->
+        <div class="product-gallery">
+          <div class="product-gallery__main" id="galleryMain">
+            <img
+              id="mainImg"
+              src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900&q=90&auto=format&fit=crop"
+              alt="Sofá Osaka — imagen principal"
+            />
+          </div>
+
+          <div class="product-gallery__thumbs">
+            <div class="product-gallery__thumb active" data-src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900&q=90&auto=format&fit=crop">
+              <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=160&q=80&auto=format&fit=crop" alt="Vista 1" />
+            </div>
+            <div class="product-gallery__thumb" data-src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=900&q=90&auto=format&fit=crop">
+              <img src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=160&q=80&auto=format&fit=crop" alt="Vista 2" />
+            </div>
+            <div class="product-gallery__thumb" data-src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&q=90&auto=format&fit=crop">
+              <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=160&q=80&auto=format&fit=crop" alt="Vista 3" />
+            </div>
+            <div class="product-gallery__thumb" data-src="https://images.unsplash.com/photo-1549187774-b4e9b0445b41?w=900&q=90&auto=format&fit=crop">
+              <img src="https://images.unsplash.com/photo-1549187774-b4e9b0445b41?w=160&q=80&auto=format&fit=crop" alt="Vista 4" />
+            </div>
+            <div class="product-gallery__thumb" data-src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=900&q=90&auto=format&fit=crop">
+              <img src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=160&q=80&auto=format&fit=crop" alt="Vista 5" />
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================== INFO ===================== -->
+        <div class="product-info">
+
+          <p class="product-info__category">Muebles — Sala de Estar</p>
+          <h1>Sofá Osaka</h1>
+
+          <div class="product-info__rating">
+            <span class="stars">★★★★★</span>
+            <span class="rating-count">4.9 (48 reseñas)</span>
+          </div>
+
+          <div class="product-info__price">
+            <span class="price-main">$285.000</span>
+            <div class="price-installments">
+              o <strong>12 cuotas de $23.750</strong><br>sin interés con tarjetas seleccionadas
+            </div>
+          </div>
+
+          <!-- Color -->
+          <div class="product-options">
+            <p class="product-options__label">
+              Color — <span id="selectedColor" style="font-weight:500;color:var(--text-primary)">Beige Bouclé</span>
+            </p>
+            <div class="color-options">
+              <button
+                class="color-swatch active"
+                style="background:#D4C9B5;"
+                title="Beige Bouclé"
+                data-label="Beige Bouclé"
+                aria-label="Beige Bouclé"
+              ></button>
+              <button
+                class="color-swatch"
+                style="background:#8B7D6B;"
+                title="Terracota"
+                data-label="Terracota"
+                aria-label="Terracota"
+              ></button>
+              <button
+                class="color-swatch"
+                style="background:#2E2926;"
+                title="Carbón"
+                data-label="Carbón"
+                aria-label="Carbón"
+              ></button>
+              <button
+                class="color-swatch"
+                style="background:#B8C4C2;"
+                title="Sage"
+                data-label="Sage"
+                aria-label="Sage"
+              ></button>
+            </div>
+          </div>
+
+          <!-- Tamaño -->
+          <div class="product-options">
+            <p class="product-options__label">
+              Medida — <span id="selectedSize" style="font-weight:500;color:var(--text-primary)">3 cuerpos</span>
+            </p>
+            <div class="size-options">
+              <button class="size-btn" data-label="2 cuerpos" data-price="218000">2 cuerpos</button>
+              <button class="size-btn active" data-label="3 cuerpos" data-price="285000">3 cuerpos</button>
+              <button class="size-btn" data-label="3 cuerpos + chaise" data-price="348000">3 + Chaise</button>
+              <button class="size-btn disabled" data-label="4 cuerpos" disabled>4 cuerpos</button>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="product-info__actions">
+            <button class="btn btn-primary add-to-cart-btn" id="addToCart" style="font-size:.8rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al Carrito — $285.000
+            </button>
+            <button class="btn btn-outline" style="font-size:.78rem;gap:8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+              Guardar en favoritos
+            </button>
+          </div>
+
+          <!-- Feature rows -->
+          <div class="product-info__features">
+            <div class="feature-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="3" width="15" height="13" rx="2"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              <div>
+                <strong>Envío gratuito</strong><br>
+                Para compras mayores a $80.000
+              </div>
+            </div>
+            <div class="feature-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <div>
+                <strong>Garantía 2 años</strong><br>
+                Estructura y tapizado cubiertos
+              </div>
+            </div>
+            <div class="feature-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <div>
+                <strong>Showroom disponible</strong><br>
+                Palermo, CABA — L a S de 10 a 19h
+              </div>
+            </div>
+            <div class="feature-row">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+              <div>
+                <strong>Devoluciones</strong><br>
+                30 días para cambios sin cargo
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabs: Descripción / Especificaciones -->
+          <div class="product-tabs">
+            <div class="tabs__nav">
+              <button class="tab-btn active" data-tab="descripcion">Descripción</button>
+              <button class="tab-btn" data-tab="especificaciones">Especificaciones</button>
+              <button class="tab-btn" data-tab="resenas">Reseñas (48)</button>
+            </div>
+
+            <div class="tab-panel active" id="tab-descripcion">
+              <p style="margin-bottom:16px;">
+                El <strong>Sofá Osaka</strong> es el resultado de una búsqueda estética inspirada en el
+                minimalismo escandinavo y la sensualidad de los materiales naturales. Su silueta limpia
+                y sus proporciones generosas invitan al descanso sin sacrificar elegancia.
+              </p>
+              <p style="margin-bottom:16px;">
+                El tapizado en tela bouclé de alta resistencia aportá calidez táctil y visual,
+                mientras que las patas en madera de roble macizo le dan una base nórdica inconfundible.
+                Disponible en cuatro colores para adaptarse a cualquier paleta de interior.
+              </p>
+              <p>
+                Ideal para livings amplios o espacios con concepto abierto. Combinalo con nuestra
+                <a href="#" style="color:var(--accent);border-bottom:1px solid var(--accent-light);">Mesa de Centro Wabi</a>
+                para completar el ambiente.
+              </p>
+            </div>
+
+            <div class="tab-panel" id="tab-especificaciones">
+              <div class="product-specs">
+                <div class="spec-row"><span class="spec-key">Largo</span><span class="spec-val">220 cm</span></div>
+                <div class="spec-row"><span class="spec-key">Profundidad</span><span class="spec-val">95 cm</span></div>
+                <div class="spec-row"><span class="spec-key">Alto respaldo</span><span class="spec-val">78 cm</span></div>
+                <div class="spec-row"><span class="spec-key">Alto asiento</span><span class="spec-val">44 cm</span></div>
+                <div class="spec-row"><span class="spec-key">Patas</span><span class="spec-val">Roble macizo</span></div>
+                <div class="spec-row"><span class="spec-key">Tapizado</span><span class="spec-val">Bouclé 100% poliéster</span></div>
+                <div class="spec-row"><span class="spec-key">Estructura</span><span class="spec-val">Madera de pino FSC</span></div>
+                <div class="spec-row"><span class="spec-key">Densidad espuma</span><span class="spec-val">35 kg/m³</span></div>
+                <div class="spec-row"><span class="spec-key">Peso</span><span class="spec-val">62 kg</span></div>
+                <div class="spec-row"><span class="spec-key">Ensamble</span><span class="spec-val">Requiere armado simple</span></div>
+              </div>
+            </div>
+
+            <div class="tab-panel" id="tab-resenas">
+              <div style="display:flex;flex-direction:column;gap:24px;">
+
+                <div style="padding-bottom:24px;border-bottom:1px solid var(--border);">
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=40&q=80&auto=format&fit=crop&crop=face" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" alt="María G." />
+                    <div>
+                      <p style="font-weight:600;font-size:.83rem;color:var(--text-primary);margin:0;">María González</p>
+                      <p style="font-size:.7rem;color:var(--text-muted);margin:0;">Noviembre 2024 — ★★★★★</p>
+                    </div>
+                  </div>
+                  <p style="font-size:.85rem;margin:0;">"Llegó en perfecto estado y el armado fue muy sencillo. La tela bouclé es exactamente como se ve en las fotos, suave y elegante. Mi living cambió completamente."</p>
+                </div>
+
+                <div style="padding-bottom:24px;border-bottom:1px solid var(--border);">
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&q=80&auto=format&fit=crop&crop=face" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" alt="Andrés M." />
+                    <div>
+                      <p style="font-weight:600;font-size:.83rem;color:var(--text-primary);margin:0;">Andrés Méndez</p>
+                      <p style="font-size:.7rem;color:var(--text-muted);margin:0;">Octubre 2024 — ★★★★★</p>
+                    </div>
+                  </div>
+                  <p style="font-size:.85rem;margin:0;">"Compramos el modelo de 3 cuerpos + chaise. La calidad es impresionante y el color Carbón combina perfecto con nuestro piso de parquet."</p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /product-info -->
+
+      </div>
+      <!-- /layout -->
+
+    </div>
+  </main>
+
+  <!-- RELATED PRODUCTS -->
+  <section class="section" style="background:var(--surface);">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:52px;" class="reveal">
+        <p class="section-label" style="justify-content:center;">Completá tu espacio</p>
+        <h2>También te puede gustar</h2>
+      </div>
+
+      <div class="products__grid" style="grid-template-columns:repeat(4,1fr);">
+
+        <article class="product-card reveal reveal-delay-1">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1549187774-b4e9b0445b41?w=500&q=82&auto=format&fit=crop" alt="Mesa de Centro Wabi" loading="lazy" />
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="5" data-name="Mesa de Centro Wabi" data-price="98000">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Muebles · Living</p>
+            <h4 class="product-card__name">Mesa de Centro Wabi</h4>
+            <div class="product-card__price"><span class="price--current">$98.000</span></div>
+          </div>
+        </article>
+
+        <article class="product-card reveal reveal-delay-2">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=500&q=82&auto=format&fit=crop" alt="Alfombra Shaggy Arena" loading="lazy" />
+            <span class="product-card__badge badge--sale">−20%</span>
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="3" data-name="Alfombra Shaggy Arena" data-price="62400">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Textiles · Alfombras</p>
+            <h4 class="product-card__name">Alfombra Shaggy Arena</h4>
+            <div class="product-card__price"><span class="price--current price--sale">$62.400</span><span class="price--original">$78.000</span></div>
+          </div>
+        </article>
+
+        <article class="product-card reveal reveal-delay-3">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=500&q=82&auto=format&fit=crop" alt="Lámpara Arco Nórdica" loading="lazy" />
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="2" data-name="Lámpara Arco Nórdica" data-price="48000">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Iluminación · Piso</p>
+            <h4 class="product-card__name">Lámpara Arco Nórdica</h4>
+            <div class="product-card__price"><span class="price--current">$48.000</span></div>
+          </div>
+        </article>
+
+        <article class="product-card reveal reveal-delay-4">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=500&q=82&auto=format&fit=crop" alt="Almohadones Lino Natural" loading="lazy" />
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="7" data-name="Almohadones Lino Natural" data-price="8900">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Textiles · Almohadones</p>
+            <h4 class="product-card__name">Almohadones Lino Natural</h4>
+            <div class="product-card__price"><span class="price--current">$8.900</span></div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CART SIDEBAR -->
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-sidebar__header">
+      <h4>Tu Carrito</h4>
+      <button class="btn-icon" id="cartClose" aria-label="Cerrar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="cart-sidebar__body" id="cartBody">
+      <div class="cart-empty" id="cartEmpty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <p>Tu carrito está vacío.</p>
+      </div>
+    </div>
+    <div class="cart-sidebar__footer" id="cartFooter" style="display:none">
+      <div class="cart-sidebar__subtotal">
+        <span>Subtotal</span>
+        <span class="amount" id="cartTotal">$0</span>
+      </div>
+      <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;padding:16px;">Finalizar compra</a>
+    </div>
+  </aside>
+
+  <div class="nav__overlay" id="cartOverlay" style="z-index:1099"></div>
+  <div class="toast" id="toast">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="toastMsg">Producto agregado</span>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+    // Product page specific: gallery thumbs
+    document.querySelectorAll('.product-gallery__thumb').forEach(thumb => {
+      thumb.addEventListener('click', function () {
+        document.querySelectorAll('.product-gallery__thumb').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        const img = document.getElementById('mainImg');
+        img.style.opacity = '0';
+        img.style.transition = 'opacity .25s ease';
+        setTimeout(() => {
+          img.src = this.dataset.src;
+          img.style.opacity = '1';
+        }, 220);
+      });
+    });
+
+    // Color swatch selection
+    document.querySelectorAll('.color-swatch').forEach(swatch => {
+      swatch.addEventListener('click', function () {
+        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('selectedColor').textContent = this.dataset.label;
+      });
+    });
+
+    // Size selection + price update
+    document.querySelectorAll('.size-btn:not(.disabled)').forEach(btn => {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('selectedSize').textContent = this.dataset.label;
+        const price = parseInt(this.dataset.price).toLocaleString('es-AR');
+        const addBtn = document.getElementById('addToCart');
+        if (addBtn) {
+          addBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            Agregar al Carrito — $${price}
+          `;
+          addBtn.dataset.price = this.dataset.price;
+        }
+      });
+    });
+
+    // Add to cart from detail page
+    document.getElementById('addToCart')?.addEventListener('click', function () {
+      const size = document.querySelector('.size-btn.active')?.dataset.label || '3 cuerpos';
+      const color = document.getElementById('selectedColor').textContent;
+      const price = this.dataset.price || '285000';
+      const img = document.getElementById('mainImg').src;
+
+      cart.add('osaka-' + size.replace(/\s/g,'-'), `Sofá Osaka — ${size}`, price, img);
+      showToast('Sofá Osaka agregado al carrito');
+      setTimeout(() => cart.open(), 320);
+    });
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('tab-' + this.dataset.tab)?.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

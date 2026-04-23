@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aura Home — Mobiliario & Decoración Premium</title>
+  <meta name="description" content="Aura Home: diseño de interiores, muebles y objetos decorativos de alta calidad para transformar tu hogar." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+  <!-- ====================================================
+       NAVIGATION
+       ==================================================== -->
+  <nav class="nav nav--hero" id="mainNav">
+    <div class="container">
+      <div class="nav__inner">
+
+        <a href="index.html" class="nav__logo">
+          Aura Home
+          <span>Design & Interiors</span>
+        </a>
+
+        <ul class="nav__menu">
+          <li><a href="#" class="nav__link active">Inicio</a></li>
+          <li><a href="#productos" class="nav__link">Productos</a></li>
+          <li><a href="#nosotros" class="nav__link">Nosotros</a></li>
+          <li><a href="#" class="nav__link">Proyectos</a></li>
+          <li><a href="#" class="nav__link">Contacto</a></li>
+        </ul>
+
+        <div class="nav__actions">
+          <button class="btn-icon" title="Buscar" aria-label="Buscar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </button>
+
+          <button class="btn-icon cart-btn" id="cartToggle" title="Carrito" aria-label="Carrito">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
+
+          <button class="nav__burger" id="menuToggle" aria-label="Menú">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Overlay -->
+  <div class="nav__overlay" id="navOverlay"></div>
+
+  <!-- Mobile Drawer -->
+  <nav class="nav__drawer" id="navDrawer">
+    <a href="index.html" class="nav__link active">Inicio</a>
+    <a href="#productos" class="nav__link">Productos</a>
+    <a href="#nosotros" class="nav__link">Nosotros</a>
+    <a href="#" class="nav__link">Proyectos</a>
+    <a href="#" class="nav__link">Contacto</a>
+  </nav>
+
+  <!-- ====================================================
+       HERO
+       ==================================================== -->
+  <section class="hero" id="hero">
+    <div class="hero__bg"></div>
+    <div class="hero__overlay"></div>
+
+    <div class="container">
+      <div class="hero__content">
+
+        <p class="hero__eyebrow">Nueva Colección 2025</p>
+
+        <h1>
+          Tu hogar,<br>
+          tu obra<br>
+          <em>maestra.</em>
+        </h1>
+
+        <p class="hero__desc">
+          Cada pieza cuenta una historia. Descubrí nuestra selección de muebles
+          y objetos de diseño para crear espacios que te inspiren cada día.
+        </p>
+
+        <div class="hero__actions">
+          <a href="#productos" class="btn btn-primary">
+            Explorar Colección
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="#nosotros" class="btn btn-outline" style="color:white;border-color:rgba(255,255,255,.5)">Nuestra Historia</a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="hero__scroll">
+      <div class="hero__scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       CATEGORIES
+       ==================================================== -->
+  <section class="categories">
+    <div class="container">
+
+      <div style="text-align:center; margin-bottom:44px;" class="reveal">
+        <p class="section-label" style="justify-content:center;"><span></span> Categorías</p>
+        <h2>Diseñado para cada rincón</h2>
+      </div>
+
+      <div class="categories__grid">
+
+        <div class="category-card reveal reveal-delay-1">
+          <img class="category-card__img" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80&auto=format&fit=crop" alt="Muebles" loading="lazy" />
+          <div class="category-card__overlay"></div>
+          <div class="category-card__content">
+            <h5>01 — Categoría</h5>
+            <h3>Muebles</h3>
+            <div class="category-card__arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="category-card reveal reveal-delay-2">
+          <img class="category-card__img" src="https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=600&q=80&auto=format&fit=crop" alt="Iluminación" loading="lazy" />
+          <div class="category-card__overlay"></div>
+          <div class="category-card__content">
+            <h5>02 — Categoría</h5>
+            <h3>Iluminación</h3>
+            <div class="category-card__arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="category-card reveal reveal-delay-3">
+          <img class="category-card__img" src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=600&q=80&auto=format&fit=crop" alt="Textiles" loading="lazy" />
+          <div class="category-card__overlay"></div>
+          <div class="category-card__content">
+            <h5>03 — Categoría</h5>
+            <h3>Textiles</h3>
+            <div class="category-card__arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="category-card reveal reveal-delay-4">
+          <img class="category-card__img" src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=600&q=80&auto=format&fit=crop" alt="Objetos Decorativos" loading="lazy" />
+          <div class="category-card__overlay"></div>
+          <div class="category-card__content">
+            <h5>04 — Categoría</h5>
+            <h3>Objetos</h3>
+            <div class="category-card__arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       FEATURED PRODUCTS
+       ==================================================== -->
+  <section class="section" id="productos">
+    <div class="container">
+
+      <div class="products__header reveal">
+        <div>
+          <p class="section-label">Productos Destacados</p>
+          <h2>Nuestra selección</h2>
+        </div>
+        <div class="products__filters">
+          <button class="filter-btn active" data-filter="all">Todos</button>
+          <button class="filter-btn" data-filter="muebles">Muebles</button>
+          <button class="filter-btn" data-filter="iluminacion">Iluminación</button>
+          <button class="filter-btn" data-filter="textiles">Textiles</button>
+          <button class="filter-btn" data-filter="objetos">Objetos</button>
+        </div>
+      </div>
+
+      <div class="products__grid" id="productsGrid">
+
+        <!-- Card 1 -->
+        <article class="product-card" data-category="muebles" data-id="1">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=82&auto=format&fit=crop" alt="Sofá Osaka" loading="lazy" />
+            <img class="product-card__img product-card__img--alt" src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=500&q=82&auto=format&fit=crop&crop=center" alt="Sofá Osaka — vista 2" loading="lazy" />
+            <span class="product-card__badge badge--new">Nuevo</span>
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="1" data-name="Sofá Osaka" data-price="285000">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Muebles · Sala</p>
+            <a href="product.html"><h4 class="product-card__name">Sofá Osaka</h4></a>
+            <div class="product-card__price">
+              <span class="price--current">$285.000</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="product-card" data-category="iluminacion" data-id="2" style="animation-delay:.08s">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=500&q=82&auto=format&fit=crop" alt="Lámpara Arco Nórdica" loading="lazy" />
+            <span class="product-card__badge badge--fav">★ Favorito</span>
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="2" data-name="Lámpara Arco Nórdica" data-price="48000">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Iluminación · Piso</p>
+            <a href="product.html"><h4 class="product-card__name">Lámpara Arco Nórdica</h4></a>
+            <div class="product-card__price">
+              <span class="price--current">$48.000</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="product-card" data-category="textiles" data-id="3" style="animation-delay:.16s">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=500&q=82&auto=format&fit=crop" alt="Alfombra Shaggy Arena" loading="lazy" />
+            <span class="product-card__badge badge--sale">−20%</span>
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="3" data-name="Alfombra Shaggy Arena" data-price="62400">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Textiles · Alfombras</p>
+            <a href="product.html"><h4 class="product-card__name">Alfombra Shaggy Arena</h4></a>
+            <div class="product-card__price">
+              <span class="price--current price--sale">$62.400</span>
+              <span class="price--original">$78.000</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="product-card" data-category="objetos" data-id="4" style="animation-delay:.24s">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=500&q=82&auto=format&fit=crop" alt="Jarrón Travertino" loading="lazy" />
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="4" data-name="Jarrón Travertino" data-price="22500">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Objetos · Cerámica</p>
+            <a href="product.html"><h4 class="product-card__name">Jarrón Travertino</h4></a>
+            <div class="product-card__price">
+              <span class="price--current">$22.500</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 5 -->
+        <article class="product-card" data-category="muebles" data-id="5" style="animation-delay:.08s">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1549187774-b4e9b0445b41?w=500&q=82&auto=format&fit=crop" alt="Mesa de Centro Wabi" loading="lazy" />
+            <span class="product-card__badge badge--new">Nuevo</span>
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="5" data-name="Mesa de Centro Wabi" data-price="98000">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Muebles · Living</p>
+            <a href="product.html"><h4 class="product-card__name">Mesa de Centro Wabi</h4></a>
+            <div class="product-card__price">
+              <span class="price--current">$98.000</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 6 -->
+        <article class="product-card" data-category="iluminacion" data-id="6" style="animation-delay:.16s">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?w=500&q=82&auto=format&fit=crop" alt="Lámpara Colgante Jute" loading="lazy" />
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="6" data-name="Lámpara Colgante Jute" data-price="31500">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Iluminación · Colgante</p>
+            <a href="product.html"><h4 class="product-card__name">Lámpara Colgante Jute</h4></a>
+            <div class="product-card__price">
+              <span class="price--current">$31.500</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 7 -->
+        <article class="product-card" data-category="textiles" data-id="7" style="animation-delay:.24s">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=500&q=82&auto=format&fit=crop" alt="Almohadones Lino Natural" loading="lazy" />
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="7" data-name="Almohadones Lino Natural" data-price="8900">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Textiles · Almohadones</p>
+            <a href="product.html"><h4 class="product-card__name">Almohadones Lino Natural</h4></a>
+            <div class="product-card__price">
+              <span class="price--current">$8.900 <small style="font-weight:400;font-size:.75em;color:var(--text-muted)">c/u</small></span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 8 -->
+        <article class="product-card" data-category="objetos" data-id="8" style="animation-delay:.32s">
+          <div class="product-card__media">
+            <img class="product-card__img" src="https://images.unsplash.com/photo-1608501078713-8e445a709b39?w=500&q=82&auto=format&fit=crop" alt="Espejo Arco Dorado" loading="lazy" />
+            <span class="product-card__badge badge--fav">★ Favorito</span>
+            <button class="product-card__wish" aria-label="Favorito">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </button>
+            <button class="product-card__cta" data-id="8" data-name="Espejo Arco Dorado" data-price="54000">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              Agregar al carrito
+            </button>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Objetos · Espejos</p>
+            <a href="product.html"><h4 class="product-card__name">Espejo Arco Dorado</h4></a>
+            <div class="product-card__price">
+              <span class="price--current">$54.000</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <div style="text-align:center; margin-top:60px;" class="reveal">
+        <a href="#" class="btn btn-outline">Ver todos los productos</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ====================================================
+       INTERMEZZO BANNER
+       ==================================================== -->
+  <div class="intermezzo">
+    <div class="intermezzo__bg"></div>
+    <div class="container">
+      <div class="intermezzo__content reveal">
+        <p class="section-label">Filosofía Aura</p>
+        <h2>"El diseño es la síntesis silenciosa de todo lo que somos."</h2>
+        <p>Cada objeto que elegís para tu hogar es un reflejo de quién sos. Nuestros diseñadores trabajan para que cada pieza cuente una historia única.</p>
+        <a href="#" class="btn btn-accent">Descubrir más</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       BRAND STORY
+       ==================================================== -->
+  <section class="section" id="nosotros">
+    <div class="container">
+      <div class="brand-story__grid">
+
+        <div class="brand-story__images reveal">
+          <div class="brand-story__img brand-story__img--tall">
+            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&q=80&auto=format&fit=crop" alt="Showroom Aura Home" loading="lazy" />
+          </div>
+          <div class="brand-story__img">
+            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&q=80&auto=format&fit=crop" alt="Detalle producto" loading="lazy" />
+          </div>
+          <div class="brand-story__img">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80&auto=format&fit=crop" alt="Proceso artesanal" loading="lazy" />
+          </div>
+        </div>
+
+        <div class="brand-story__content reveal reveal-delay-2">
+          <p class="section-label">Nuestra Historia</p>
+          <h2>Creamos hogares con alma desde 2015</h2>
+          <p>
+            Aura Home nació de una convicción simple: los espacios donde vivimos moldean quienes somos.
+            Cada producto de nuestra colección es seleccionado o diseñado con la misma exigencia —
+            materiales nobles, formas intemporales, y un profundo respeto por la artesanía.
+          </p>
+          <p>
+            Trabajamos junto a diseñadores y artesanos locales para traerte piezas que no solo
+            decoran, sino que transforman la manera en que sentís tu hogar.
+          </p>
+
+          <div class="brand-story__stat">
+            <div>
+              <span class="stat__number">+4.200</span>
+              <span class="stat__label">Hogares transformados</span>
+            </div>
+            <div>
+              <span class="stat__number">68</span>
+              <span class="stat__label">Diseñadores locales</span>
+            </div>
+            <div>
+              <span class="stat__number">9</span>
+              <span class="stat__label">Años de trayectoria</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       TESTIMONIALS
+       ==================================================== -->
+  <section class="section testimonials">
+    <div class="container">
+      <div style="text-align:center;" class="reveal">
+        <p class="section-label" style="justify-content:center;">Testimonios</p>
+        <h2>Lo que dicen nuestros clientes</h2>
+      </div>
+
+      <div class="testimonials__grid">
+
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="testimonial-card__stars">★★★★★</div>
+          <p class="testimonial-card__text">
+            "Compré el sofá Osaka y transformó completamente mi living. La calidad es impresionante
+            y el servicio de delivery fue impecable. Ya estoy pensando en la mesa de centro."
+          </p>
+          <div class="testimonial-card__author">
+            <img class="testimonial-card__avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=88&q=80&auto=format&fit=crop&crop=face" alt="María G." loading="lazy" />
+            <div>
+              <span class="testimonial-card__name">María González</span>
+              <span class="testimonial-card__role">Cliente desde 2022 · Buenos Aires</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="testimonial-card__stars">★★★★★</div>
+          <p class="testimonial-card__text">
+            "Redecoramos toda la casa con Aura Home y el resultado superó todas nuestras expectativas.
+            Los materiales son de una calidad excepcional y cada pieza tiene una personalidad única."
+          </p>
+          <div class="testimonial-card__author">
+            <img class="testimonial-card__avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=88&q=80&auto=format&fit=crop&crop=face" alt="Andrés M." loading="lazy" />
+            <div>
+              <span class="testimonial-card__name">Andrés Méndez</span>
+              <span class="testimonial-card__role">Cliente desde 2021 · Córdoba</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal reveal-delay-3">
+          <div class="testimonial-card__stars">★★★★★</div>
+          <p class="testimonial-card__text">
+            "La atención personalizada que recibí al consultar por colores y materiales fue increíble.
+            Se nota que cada persona en Aura Home ama genuinamente el diseño de interiores."
+          </p>
+          <div class="testimonial-card__author">
+            <img class="testimonial-card__avatar" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=88&q=80&auto=format&fit=crop&crop=face" alt="Luciana P." loading="lazy" />
+            <div>
+              <span class="testimonial-card__name">Luciana Pérez</span>
+              <span class="testimonial-card__role">Diseñadora de interiores · Rosario</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       NEWSLETTER
+       ==================================================== -->
+  <section class="newsletter">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label" style="justify-content:center; color:var(--accent);">Newsletter</p>
+        <h2>Inspiración directo a tu bandeja</h2>
+        <p>Suscribite para recibir tendencias, lanzamientos exclusivos y descuentos especiales para suscriptores.</p>
+        <form class="newsletter__form" id="newsletterForm">
+          <input type="email" class="newsletter__input" placeholder="tu@email.com" required autocomplete="email" />
+          <button type="submit" class="newsletter__submit">Suscribirme</button>
+        </form>
+        <span class="newsletter__note">Sin spam. Podés darte de baja cuando quieras.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       FOOTER
+       ==================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+
+        <div class="footer__brand">
+          <a href="index.html" class="nav__logo">
+            Aura Home
+            <span>Design & Interiors</span>
+          </a>
+          <p>Transformamos espacios con diseño auténtico, materiales nobles y una curaduría pensada para vos.</p>
+          <div class="footer__social">
+            <a href="#" aria-label="Instagram">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="#" aria-label="Pinterest">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.65 7.86 6.39 9.29-.09-.78-.17-1.98.04-2.83.19-.77 1.27-5.37 1.27-5.37s-.32-.65-.32-1.61c0-1.5.87-2.63 1.96-2.63.92 0 1.37.69 1.37 1.52 0 .93-.59 2.31-.9 3.59-.26 1.07.54 1.94 1.59 1.94 1.91 0 3.19-2.46 3.19-5.38 0-2.22-1.49-3.78-3.63-3.78-2.47 0-3.92 1.85-3.92 3.77 0 .75.29 1.55.65 1.99a.26.26 0 01.06.25c-.07.28-.22.88-.25 1-.04.16-.13.2-.3.12-.89-.41-1.45-1.7-1.45-2.74 0-2.63 1.91-5.04 5.52-5.04 2.9 0 5.15 2.07 5.15 4.82 0 2.88-1.81 5.19-4.32 5.19-.84 0-1.63-.44-1.9-.95l-.52 1.93c-.19.71-.69 1.6-1.03 2.14.78.24 1.6.37 2.46.37 5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+            </a>
+            <a href="#" aria-label="Facebook">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer__col">
+          <h5>Tienda</h5>
+          <ul>
+            <li><a href="#">Muebles</a></li>
+            <li><a href="#">Iluminación</a></li>
+            <li><a href="#">Textiles</a></li>
+            <li><a href="#">Objetos</a></li>
+            <li><a href="#">Novedades</a></li>
+            <li><a href="#">Ofertas</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__col">
+          <h5>Servicios</h5>
+          <ul>
+            <li><a href="#">Asesoramiento de interiores</a></li>
+            <li><a href="#">Proyectos a medida</a></li>
+            <li><a href="#">Showroom</a></li>
+            <li><a href="#">Delivery e instalación</a></li>
+            <li><a href="#">Gift cards</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__col">
+          <h5>Información</h5>
+          <ul>
+            <li><a href="#">Sobre Aura Home</a></li>
+            <li><a href="#">Blog de diseño</a></li>
+            <li><a href="#">Cambios y devoluciones</a></li>
+            <li><a href="#">Términos y condiciones</a></li>
+            <li><a href="#">Preguntas frecuentes</a></li>
+            <li><a href="#">Contacto</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer__bottom">
+        <p style="color:rgba(255,255,255,.35); font-size:.75rem;">© 2025 Aura Home. Todos los derechos reservados.</p>
+        <div class="footer__payments">
+          <span class="payment-icon">VISA</span>
+          <span class="payment-icon">MC</span>
+          <span class="payment-icon">AMEX</span>
+          <span class="payment-icon">MP</span>
+          <span class="payment-icon">DEBIN</span>
+        </div>
+        <p style="color:rgba(255,255,255,.25); font-size:.7rem;">Diseñado con ♥ en Argentina</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ====================================================
+       CART SIDEBAR
+       ==================================================== -->
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-sidebar__header">
+      <h4>Tu Carrito</h4>
+      <button class="btn-icon" id="cartClose" aria-label="Cerrar carrito">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="cart-sidebar__body" id="cartBody">
+      <div class="cart-empty" id="cartEmpty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <p>Tu carrito está vacío.<br>Explorá nuestra colección.</p>
+        <a href="#productos" class="btn btn-outline" style="font-size:.7rem;padding:10px 20px">Ver productos</a>
+      </div>
+    </div>
+    <div class="cart-sidebar__footer" id="cartFooter" style="display:none">
+      <div class="cart-sidebar__subtotal">
+        <span>Subtotal</span>
+        <span class="amount" id="cartTotal">$0</span>
+      </div>
+      <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;padding:16px;">
+        Finalizar compra
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <div class="nav__overlay" id="cartOverlay" style="z-index:1099"></div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="toastMsg">Producto agregado al carrito</span>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
