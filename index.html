@@ -16,6 +16,22 @@
 <body>
 
   <!-- ====================================================
+       ANNOUNCEMENT BAR
+       ==================================================== -->
+  <div class="announce-bar" id="announceBar">
+    <div class="announce-bar__inner">
+      <span>Nuevo en <a href="#">Muebles</a></span>
+      <span class="announce-bar__sep">|</span>
+      <span>Nuevo en <a href="#">Iluminación</a></span>
+      <span class="announce-bar__sep">|</span>
+      <span>Nuevo en <a href="#">Textiles</a></span>
+      <span class="announce-bar__sep">|</span>
+      <span>🚚 Envío gratis en compras +$80.000</span>
+    </div>
+    <button class="announce-bar__close" id="announceClose" aria-label="Cerrar">✕</button>
+  </div>
+
+  <!-- ====================================================
        NAVIGATION
        ==================================================== -->
   <nav class="nav nav--hero" id="mainNav">
@@ -29,10 +45,218 @@
 
         <ul class="nav__menu">
           <li><a href="#" class="nav__link active">Inicio</a></li>
-          <li><a href="#productos" class="nav__link">Productos</a></li>
+
+          <!-- MUEBLES -->
+          <li class="nav__item--mega">
+            <a href="#productos" class="nav__link nav__link--dropdown">
+              Muebles
+              <svg class="nav__chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </a>
+            <div class="mega-menu">
+              <div class="container">
+                <div class="mega-menu__grid">
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">New In</p>
+                    <ul>
+                      <li><a href="#">Novedades</a></li>
+                      <li><a href="#">Best Sellers</a></li>
+                      <li><a href="#">Outlet</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">Sofás & Sillones</p>
+                    <ul>
+                      <li><a href="#">Sofás de 2 cuerpos</a></li>
+                      <li><a href="#">Sofás de 3 cuerpos</a></li>
+                      <li><a href="#">Sofás con chaise</a></li>
+                      <li><a href="#">Sillones individuales</a></li>
+                      <li><a href="#">Poltronas</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">Mesas</p>
+                    <ul>
+                      <li><a href="#">Mesas de comedor</a></li>
+                      <li><a href="#">Mesas de centro</a></li>
+                      <li><a href="#">Mesas auxiliares</a></li>
+                      <li><a href="#">Escritorios</a></li>
+                      <li><a href="#">Consolas</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">Almacenamiento</p>
+                    <ul>
+                      <li><a href="#">Bibliotecas</a></li>
+                      <li><a href="#">Aparadores</a></li>
+                      <li><a href="#">Cómodas</a></li>
+                      <li><a href="#">Rack TV</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col mega-menu__col--img">
+                    <a href="#" class="mega-menu__promo">
+                      <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=320&q=80&auto=format&fit=crop" alt="Colección Sofás" />
+                      <span class="mega-menu__promo-label">Colección Osaka</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- ILUMINACIÓN -->
+          <li class="nav__item--mega">
+            <a href="#" class="nav__link nav__link--dropdown">
+              Iluminación
+              <svg class="nav__chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </a>
+            <div class="mega-menu">
+              <div class="container">
+                <div class="mega-menu__grid">
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">New In</p>
+                    <ul>
+                      <li><a href="#">Novedades</a></li>
+                      <li><a href="#">Best Sellers</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">Por tipo</p>
+                    <ul>
+                      <li><a href="#">Colgantes</a></li>
+                      <li><a href="#">De pie</a></li>
+                      <li><a href="#">De mesa</a></li>
+                      <li><a href="#">Apliques de pared</a></li>
+                      <li><a href="#">Plafones</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">Por material</p>
+                    <ul>
+                      <li><a href="#">Rattan & Jute</a></li>
+                      <li><a href="#">Metal</a></li>
+                      <li><a href="#">Vidrio</a></li>
+                      <li><a href="#">Cerámica</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">Exterior</p>
+                    <ul>
+                      <li><a href="#">Jardín</a></li>
+                      <li><a href="#">Terraza</a></li>
+                      <li><a href="#">Solar</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col mega-menu__col--img">
+                    <a href="#" class="mega-menu__promo">
+                      <img src="https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?w=320&q=80&auto=format&fit=crop" alt="Iluminación" />
+                      <span class="mega-menu__promo-label">Nueva colección</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- TEXTILES -->
+          <li class="nav__item--mega">
+            <a href="#" class="nav__link nav__link--dropdown">
+              Textiles
+              <svg class="nav__chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </a>
+            <div class="mega-menu">
+              <div class="container">
+                <div class="mega-menu__grid">
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">New In</p>
+                    <ul>
+                      <li><a href="#">Novedades</a></li>
+                      <li><a href="#">Best Sellers</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">Alfombras</p>
+                    <ul>
+                      <li><a href="#">Shaggy</a></li>
+                      <li><a href="#">Kilim</a></li>
+                      <li><a href="#">Lana natural</a></li>
+                      <li><a href="#">Exterior</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">Cama & Baño</p>
+                    <ul>
+                      <li><a href="#">Ropa de cama</a></li>
+                      <li><a href="#">Toallas</a></li>
+                      <li><a href="#">Almohadones</a></li>
+                      <li><a href="#">Mantas & Throws</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">Ventanas</p>
+                    <ul>
+                      <li><a href="#">Cortinas lino</a></li>
+                      <li><a href="#">Cortinas blackout</a></li>
+                      <li><a href="#">Visillos</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col mega-menu__col--img">
+                    <a href="#" class="mega-menu__promo">
+                      <img src="https://images.unsplash.com/photo-1616046229478-9901c5536a45?w=320&q=80&auto=format&fit=crop" alt="Textiles" />
+                      <span class="mega-menu__promo-label">Textiles naturales</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+
+          <!-- OBJETOS -->
+          <li class="nav__item--mega">
+            <a href="#" class="nav__link nav__link--dropdown">
+              Objetos
+              <svg class="nav__chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </a>
+            <div class="mega-menu">
+              <div class="container">
+                <div class="mega-menu__grid">
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">New In</p>
+                    <ul>
+                      <li><a href="#">Novedades</a></li>
+                      <li><a href="#">Best Sellers</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">Decoración</p>
+                    <ul>
+                      <li><a href="#">Jarrones & Floreros</a></li>
+                      <li><a href="#">Espejos</a></li>
+                      <li><a href="#">Cuadros & Arte</a></li>
+                      <li><a href="#">Esculturas</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col">
+                    <p class="mega-menu__heading">Hogar</p>
+                    <ul>
+                      <li><a href="#">Velas & Aromas</a></li>
+                      <li><a href="#">Cestos & Organizadores</a></li>
+                      <li><a href="#">Plantas & Macetas</a></li>
+                      <li><a href="#">Relojes</a></li>
+                    </ul>
+                  </div>
+                  <div class="mega-menu__col mega-menu__col--img">
+                    <a href="#" class="mega-menu__promo">
+                      <img src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=320&q=80&auto=format&fit=crop" alt="Objetos" />
+                      <span class="mega-menu__promo-label">Objetos de autor</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+
           <li><a href="#nosotros" class="nav__link">Nosotros</a></li>
-          <li><a href="#" class="nav__link">Proyectos</a></li>
-          <li><a href="#" class="nav__link">Contacto</a></li>
+          <li><a href="#" class="nav__link" style="color:#C0504E;font-weight:600;">SALE</a></li>
         </ul>
 
         <div class="nav__actions">
@@ -64,10 +288,44 @@
   <!-- Mobile Drawer -->
   <nav class="nav__drawer" id="navDrawer">
     <a href="index.html" class="nav__link active">Inicio</a>
-    <a href="#productos" class="nav__link">Productos</a>
+    <details class="drawer__details">
+      <summary class="nav__link">Muebles</summary>
+      <div class="drawer__sub">
+        <a href="#">Sofás & Sillones</a>
+        <a href="#">Mesas</a>
+        <a href="#">Almacenamiento</a>
+        <a href="#">Escritorios</a>
+      </div>
+    </details>
+    <details class="drawer__details">
+      <summary class="nav__link">Iluminación</summary>
+      <div class="drawer__sub">
+        <a href="#">Colgantes</a>
+        <a href="#">De pie</a>
+        <a href="#">De mesa</a>
+        <a href="#">Exterior</a>
+      </div>
+    </details>
+    <details class="drawer__details">
+      <summary class="nav__link">Textiles</summary>
+      <div class="drawer__sub">
+        <a href="#">Alfombras</a>
+        <a href="#">Almohadones</a>
+        <a href="#">Mantas</a>
+        <a href="#">Cortinas</a>
+      </div>
+    </details>
+    <details class="drawer__details">
+      <summary class="nav__link">Objetos</summary>
+      <div class="drawer__sub">
+        <a href="#">Jarrones</a>
+        <a href="#">Espejos</a>
+        <a href="#">Cuadros</a>
+        <a href="#">Velas</a>
+      </div>
+    </details>
     <a href="#nosotros" class="nav__link">Nosotros</a>
-    <a href="#" class="nav__link">Proyectos</a>
-    <a href="#" class="nav__link">Contacto</a>
+    <a href="#" class="nav__link" style="color:#C0504E;font-weight:600;">SALE</a>
   </nav>
 
   <!-- ====================================================

@@ -3,21 +3,35 @@
    Módulos: Nav, Cart, Filters, Scroll Reveal, Wishlist
    ============================================================ */
 
+// --- ANNOUNCE BAR close ---
+(function () {
+  const bar   = document.getElementById('announceBar');
+  const close = document.getElementById('announceClose');
+  if (!bar || !close) return;
+  close.addEventListener('click', () => {
+    bar.classList.add('hidden');
+    sessionStorage.setItem('announceHidden', '1');
+  });
+  if (sessionStorage.getItem('announceHidden')) bar.classList.add('hidden');
+})();
+
 // --- NAV: Transparente → sólida al scroll ---
 (function () {
-  const nav = document.getElementById('mainNav');
+  const nav     = document.getElementById('mainNav');
+  const announce = document.getElementById('announceBar');
   if (!nav) return;
 
   let lastY = 0;
 
   function onScroll() {
     const y = window.scrollY;
-    const isScrolled = y > 60;
+    const announceH = announce && !announce.classList.contains('hidden') ? announce.offsetHeight : 0;
+    const threshold = announceH + 40;
+    const isScrolled = y > threshold;
 
     nav.classList.toggle('scrolled', isScrolled);
     nav.classList.toggle('nav--hero', !isScrolled);
 
-    // Ocultar/mostrar nav al scrollear rápido
     if (y > 200) {
       nav.style.transform = y > lastY + 4 ? 'translateY(-100%)' : 'translateY(0)';
     } else {

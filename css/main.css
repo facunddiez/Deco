@@ -35,6 +35,7 @@
   --transition: 300ms cubic-bezier(.25,.46,.45,.94);
   --transition-slow: 600ms cubic-bezier(.25,.46,.45,.94);
 
+  --announce-h: 36px;
   --nav-h: 80px;
   --section-gap: 100px;
   --max-w: 1440px;
@@ -193,17 +194,68 @@ p { font-size: .9375rem; color: var(--text-secondary); line-height: 1.75; }
 }
 
 /* ============================================================
+   ANNOUNCEMENT BAR
+   ============================================================ */
+.announce-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1001;
+  height: var(--announce-h);
+  background: var(--dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: height var(--transition), opacity var(--transition);
+  overflow: hidden;
+}
+.announce-bar.hidden { height: 0; opacity: 0; pointer-events: none; }
+
+.announce-bar__inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.65);
+}
+.announce-bar__inner a {
+  color: var(--accent);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--transition);
+}
+.announce-bar__inner a:hover { border-color: var(--accent); }
+.announce-bar__sep { opacity: .3; }
+
+.announce-bar__close {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.4);
+  font-size: .75rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  transition: color var(--transition);
+}
+.announce-bar__close:hover { color: var(--white); }
+
+/* ============================================================
    NAVIGATION
    ============================================================ */
 .nav {
   position: fixed;
-  top: 0; left: 0; right: 0;
+  top: var(--announce-h); left: 0; right: 0;
   z-index: 1000;
   height: var(--nav-h);
   display: flex;
   align-items: center;
-  transition: background var(--transition), box-shadow var(--transition), backdrop-filter var(--transition);
+  transition: background var(--transition), box-shadow var(--transition), backdrop-filter var(--transition), top var(--transition);
 }
+/* Cuando se cierra la barra de anuncios el nav sube */
+.announce-bar.hidden ~ .nav { top: 0; }
 
 .nav.scrolled {
   background: rgba(250, 249, 246, .95);
@@ -275,6 +327,168 @@ p { font-size: .9375rem; color: var(--text-secondary); line-height: 1.75; }
 .nav__link:hover::after,
 .nav__link.active::after { width: 100%; }
 .nav__link:hover { color: var(--accent); }
+
+/* Links con dropdown no usan el underline ::after */
+.nav__link--dropdown::after { display: none; }
+
+.nav__link--dropdown {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nav__chevron {
+  transition: transform var(--transition);
+  flex-shrink: 0;
+}
+.nav__item--mega:hover .nav__chevron { transform: rotate(180deg); }
+
+/* ============================================================
+   MEGA MENU
+   ============================================================ */
+.nav__item--mega {
+  position: static;
+}
+
+.mega-menu {
+  position: fixed;
+  top: calc(var(--announce-h) + var(--nav-h));
+  left: 0; right: 0;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 20px 48px rgba(44,36,32,.10);
+  z-index: 990;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity .22s ease, transform .22s ease, visibility .22s;
+  pointer-events: none;
+}
+
+/* Ajuste cuando la barra de anuncios está oculta */
+.announce-bar.hidden ~ .nav .mega-menu {
+  top: var(--nav-h);
+}
+
+.nav__item--mega:hover .mega-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.mega-menu__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) 200px;
+  gap: 0;
+  padding-block: 36px 40px;
+}
+
+.mega-menu__col {
+  padding: 0 28px;
+  border-right: 1px solid var(--border);
+}
+.mega-menu__col:first-child { padding-left: 0; }
+.mega-menu__col:last-child  { border-right: none; }
+
+.mega-menu__heading {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mega-menu__col ul {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.mega-menu__col ul a {
+  font-size: .8rem;
+  color: var(--text-secondary);
+  transition: color var(--transition), padding-left var(--transition);
+  display: block;
+}
+.mega-menu__col ul a:hover {
+  color: var(--accent-dark);
+  padding-left: 6px;
+}
+
+/* Columna imagen promo */
+.mega-menu__col--img {
+  padding: 0 0 0 24px;
+  border-right: none;
+}
+
+.mega-menu__promo {
+  display: block;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+}
+.mega-menu__promo img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+.mega-menu__promo:hover img { transform: scale(1.04); }
+
+.mega-menu__promo-label {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 20px 14px 14px;
+  background: linear-gradient(to top, rgba(42,36,32,.75), transparent);
+  color: var(--white);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* Mobile drawer details/summary */
+.drawer__details { border-bottom: 1px solid var(--border); }
+.drawer__details summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 0;
+  font-size: .9rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.drawer__details summary::after {
+  content: '+';
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: var(--text-muted);
+  transition: transform var(--transition);
+}
+.drawer__details[open] summary::after { transform: rotate(45deg); }
+.drawer__details summary::-webkit-details-marker { display: none; }
+
+.drawer__sub {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 12px;
+  padding-left: 12px;
+  gap: 8px;
+}
+.drawer__sub a {
+  font-size: .82rem;
+  color: var(--text-secondary);
+  padding: 4px 0;
+  transition: color var(--transition);
+}
+.drawer__sub a:hover { color: var(--accent); }
 
 .nav__actions {
   display: flex;
