@@ -341,27 +341,31 @@ p { font-size: .9375rem; color: var(--text-secondary); line-height: 1.75; }
   transition: transform var(--transition);
   flex-shrink: 0;
 }
-.nav__item--mega:hover .nav__chevron { transform: rotate(180deg); }
+/* chevron gestionado por JS + fallback hover — ver bloque mega-menu */
 
 /* ============================================================
    MEGA MENU
    ============================================================ */
 .nav__item--mega {
   position: static;
+  /* Extiende el área de hover hasta el dropdown para que el mouse no pierda el foco */
+  padding-bottom: 4px;
+  margin-bottom: -4px;
 }
 
 .mega-menu {
   position: fixed;
   top: calc(var(--announce-h) + var(--nav-h));
   left: 0; right: 0;
-  background: var(--bg);
-  border-top: 1px solid var(--border);
-  box-shadow: 0 20px 48px rgba(44,36,32,.10);
+  background: var(--white);
+  /* Sin border-top: el menú queda pegado a la barra de nav */
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 16px 48px rgba(44,36,32,.12), 0 2px 8px rgba(44,36,32,.06);
   z-index: 990;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-8px);
-  transition: opacity .22s ease, transform .22s ease, visibility .22s;
+  transform: translateY(0);          /* sin desplazamiento para evitar el gap */
+  transition: opacity .18s ease, visibility .18s;
   pointer-events: none;
 }
 
@@ -370,12 +374,16 @@ p { font-size: .9375rem; color: var(--text-secondary); line-height: 1.75; }
   top: var(--nav-h);
 }
 
-.nav__item--mega:hover .mega-menu {
+/* Activado por JS (.mega-open) y también por :hover como fallback */
+.nav__item--mega:hover .mega-menu,
+.nav__item--mega.mega-open .mega-menu {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
   pointer-events: all;
 }
+
+.nav__item--mega:hover .nav__chevron,
+.nav__item--mega.mega-open .nav__chevron { transform: rotate(180deg); }
 
 .mega-menu__grid {
   display: grid;
