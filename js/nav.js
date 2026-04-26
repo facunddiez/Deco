@@ -1,5 +1,5 @@
 /* ============================================================
-   AURA HOME — Shared Nav (mega menus completos + hover estable)
+   CASA MATER — Shared Nav (mega menus completos + hover estable)
    Incluir ANTES de main.js en cada página.
    Agregar data-page="indoor|outdoor|iluminacion|textiles|decoracion|sale"
    al <body> para marcar el ítem activo.

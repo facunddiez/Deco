@@ -1,5 +1,5 @@
 /* ============================================================
-   AURA HOME — Main JS
+   CASA MATER — Main JS
    Módulos: Nav, Cart, Filters, Scroll Reveal, Wishlist
    ============================================================ */
 
@@ -285,7 +285,7 @@ document.addEventListener('click', function (e) {
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     const input = form.querySelector('input');
-    showToast('¡Gracias! Ya estás suscrito a Aura Home.');
+    showToast('¡Gracias! Ya estás suscrito a Casa Mater.');
     input.value = '';
   });
 })();

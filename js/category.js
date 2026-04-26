@@ -1,5 +1,5 @@
 /* ============================================================
-   AURA HOME — Category Page JS
+   CASA MATER — Category Page JS
    Filtros, ordenar, vista, wishlist
    ============================================================ */
 
