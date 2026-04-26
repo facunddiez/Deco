@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate subcategory and sub-subcategory pages for Casa Mater."""
 
-import os, re
+import os
 
 DEST = "/Users/facu/Desktop/Claude/Deco"
 
@@ -261,22 +261,33 @@ def product_card(name, sub, price, img_url, badge=""):
   </div>
 </article>"""
 
+PRICE_FILTER_HTML = '''<div class="filter-group">
+  <button class="filter-group__header">Precio <span class="filter-group__icon">+</span></button>
+  <div class="filter-group__body price-range-body">
+    <div class="price-range-row">
+      <div class="price-range-field"><label class="price-range-label">DESDE</label><input type="number" id="priceFrom" class="price-input" placeholder="0" min="0"></div>
+      <div class="price-range-field"><label class="price-range-label">HASTA</label><input type="number" id="priceTo" class="price-input" placeholder="Sin límite" min="0"></div>
+    </div>
+    <button class="price-apply-btn" id="applyPrice">APLICAR</button>
+  </div>
+</div>'''
+
 def filter_sidebar(cat_key):
     filters = {
-        "indoor":      [("Estilo","Escandinavo,Moderno,Industrial,Clásico"),("Material","Tela,Cuero,Madera,Metal"),("Color","Beige,Gris,Negro,Blanco,Terracota"),("Precio","")],
-        "outdoor":     [("Material","Aluminio,Ratán,Teca,Hierro,Cemento"),("Tipo","Sofás,Sillas,Mesas,Accesorios"),("Color","Negro,Gris,Blanco,Natural"),("Precio","")],
-        "iluminacion": [("Tipo","Colgante,De pie,De mesa,Aplique"),("Material","Ratán,Metal,Vidrio,Cerámica"),("Color","Negro,Dorado,Blanco,Natural"),("Precio","")],
-        "textiles":    [("Tipo","Alfombras,Almohadones,Mantas,Cortinas"),("Material","Lana,Algodón,Lino,Yute"),("Color","Natural,Gris,Azul,Terracota"),("Precio","")],
-        "decoracion":  [("Categoría","Jarrones,Espejos,Cuadros,Velas"),("Material","Cerámica,Vidrio,Metal,Madera"),("Estilo","Minimalista,Orgánico,Industrial"),("Precio","")],
+        "indoor":      [("Estilo","Escandinavo,Moderno,Industrial,Clásico"),("Material","Tela,Cuero,Madera,Metal"),("Color","Beige,Gris,Negro,Blanco,Terracota")],
+        "outdoor":     [("Material","Aluminio,Ratán,Teca,Hierro,Cemento"),("Tipo","Sofás,Sillas,Mesas,Accesorios"),("Color","Negro,Gris,Blanco,Natural")],
+        "iluminacion": [("Tipo","Colgante,De pie,De mesa,Aplique"),("Material","Ratán,Metal,Vidrio,Cerámica"),("Color","Negro,Dorado,Blanco,Natural")],
+        "textiles":    [("Tipo","Alfombras,Almohadones,Mantas,Cortinas"),("Material","Lana,Algodón,Lino,Yute"),("Color","Natural,Gris,Azul,Terracota")],
+        "decoracion":  [("Categoría","Jarrones,Espejos,Cuadros,Velas"),("Material","Cerámica,Vidrio,Metal,Madera"),("Estilo","Minimalista,Orgánico,Industrial")],
     }
     groups = filters.get(cat_key, filters["indoor"])
     html = '<aside class="cat-filters">'
     for (title, opts) in groups:
         opts_html = ""
-        if opts:
-            for o in opts.split(","):
-                opts_html += f'<label class="filter-option"><input type="checkbox"> {o}</label>'
+        for o in opts.split(","):
+            opts_html += f'<label class="filter-option"><input type="checkbox" data-filter-group="{title.lower()}"> {o}</label>'
         html += f'<div class="filter-group"><button class="filter-group__header">{title} <span class="filter-group__icon">+</span></button><div class="filter-group__body">{opts_html}</div></div>'
+    html += PRICE_FILTER_HTML
     html += '</aside>'
     return html
 
@@ -286,7 +297,7 @@ def toolbar(count):
   <div class="cat-toolbar__right">
     <span class="cat-toolbar__count">Mostrando <strong>{count}</strong> de <strong>{count}</strong> resultados.</span>
     <div class="cat-toolbar__views"><span style="font-size:.68rem;color:var(--text-muted)">Vista:</span><button class="view-btn active" data-view="3"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="0" width="4" height="4"/><rect x="6" y="0" width="4" height="4"/><rect x="12" y="0" width="4" height="4"/><rect x="0" y="6" width="4" height="4"/><rect x="6" y="6" width="4" height="4"/><rect x="12" y="6" width="4" height="4"/></svg></button><button class="view-btn" data-view="4"><svg width="14" height="14" viewBox="0 0 18 18" fill="currentColor"><rect x="0" y="0" width="3" height="3"/><rect x="5" y="0" width="3" height="3"/><rect x="10" y="0" width="3" height="3"/><rect x="15" y="0" width="3" height="3"/><rect x="0" y="5" width="3" height="3"/><rect x="5" y="5" width="3" height="3"/><rect x="10" y="5" width="3" height="3"/><rect x="15" y="5" width="3" height="3"/></svg></button></div>
-    <div class="cat-toolbar__sort"><span>Ordenar por:</span><select class="sort-select"><option>Más Nuevo</option><option>Precio: menor a mayor</option><option>Precio: mayor a menor</option></select></div>
+    <div class="cat-toolbar__sort"><span>Ordenar por:</span><select class="sort-select"><option value="newest">Más Nuevo</option><option value="price-asc">Precio: menor a mayor</option><option value="price-desc">Precio: mayor a menor</option></select></div>
   </div>
 </div>"""
 
@@ -326,9 +337,9 @@ def gen_subcategory_page(cat_key, cat, sub_key, sub):
 
     total = sum(len(ss["products"]) for ss in sub["subsubs"].values())
 
-    html = head(f"{label} {cat_label}", page_id)
+    html = head(f"{label} — {cat_label}", page_id)
     html += announce_nav(label)
-    html += cat_hero(f"{label} — {cat_label}", hero_url(pool))
+    html += cat_hero(label, hero_url(pool))
     html += f"""<div class="cat-page"><div class="container">
   <div class="cat-breadcrumb-bar">{breadcrumb(crumbs)}</div>
   {toolbar(total)}

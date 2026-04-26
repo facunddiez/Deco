@@ -286,6 +286,56 @@ body.no-announce .cat-hero { margin-top: var(--nav-h); }
   margin-top: 6px;
 }
 
+/* Price range DESDE/HASTA */
+.price-range-body { padding-top: 4px; }
+.price-range-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.price-range-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.price-range-label {
+  font-size: .6rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  color: var(--text-muted);
+}
+.price-input {
+  width: 100%;
+  padding: 7px 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-family: var(--font-body);
+  font-size: .78rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color .15s;
+  -moz-appearance: textfield;
+}
+.price-input::-webkit-inner-spin-button,
+.price-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.price-input:focus { border-color: var(--text-primary); }
+.price-apply-btn {
+  width: 100%;
+  padding: 8px;
+  background: var(--text-primary);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: .65rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: background .15s;
+}
+.price-apply-btn:hover { background: var(--accent); }
+
 /* --- Products area --- */
 .cat-main { min-width: 0; }
 

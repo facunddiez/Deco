@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mesas & Accesorios Outdoor — Casa Mater</title>
+  <title>Mesas & Accesorios — Outdoor — Casa Mater</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/main.css" /><link rel="stylesheet" href="css/category.css" />
@@ -19,9 +19,9 @@
 </div></div></nav>
 <div class="nav__overlay" id="navOverlay"></div>
 <nav class="nav__drawer" id="navDrawer"></nav><div class="cat-hero">
-  <img class="cat-hero__bg" src="https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1600&q=80&auto=format&fit=crop" alt="Mesas & Accesorios — Outdoor" />
+  <img class="cat-hero__bg" src="https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1600&q=80&auto=format&fit=crop" alt="Mesas & Accesorios" />
   <div class="cat-hero__overlay"></div>
-  <h1 class="cat-hero__title">Mesas & Accesorios — Outdoor</h1>
+  <h1 class="cat-hero__title">Mesas & Accesorios</h1>
 </div><div class="cat-page"><div class="container">
   <div class="cat-breadcrumb-bar"><nav class='breadcrumb'><a href='index.html'>Home</a><span class='breadcrumb__sep'>/</span><a href='outdoor.html'>Outdoor</a><span class='breadcrumb__sep'>/</span><span>Mesas & Accesorios</span></nav></div>
   <div class="cat-toolbar">
@@ -29,11 +29,20 @@
   <div class="cat-toolbar__right">
     <span class="cat-toolbar__count">Mostrando <strong>16</strong> de <strong>16</strong> resultados.</span>
     <div class="cat-toolbar__views"><span style="font-size:.68rem;color:var(--text-muted)">Vista:</span><button class="view-btn active" data-view="3"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="0" width="4" height="4"/><rect x="6" y="0" width="4" height="4"/><rect x="12" y="0" width="4" height="4"/><rect x="0" y="6" width="4" height="4"/><rect x="6" y="6" width="4" height="4"/><rect x="12" y="6" width="4" height="4"/></svg></button><button class="view-btn" data-view="4"><svg width="14" height="14" viewBox="0 0 18 18" fill="currentColor"><rect x="0" y="0" width="3" height="3"/><rect x="5" y="0" width="3" height="3"/><rect x="10" y="0" width="3" height="3"/><rect x="15" y="0" width="3" height="3"/><rect x="0" y="5" width="3" height="3"/><rect x="5" y="5" width="3" height="3"/><rect x="10" y="5" width="3" height="3"/><rect x="15" y="5" width="3" height="3"/></svg></button></div>
-    <div class="cat-toolbar__sort"><span>Ordenar por:</span><select class="sort-select"><option>Más Nuevo</option><option>Precio: menor a mayor</option><option>Precio: mayor a menor</option></select></div>
+    <div class="cat-toolbar__sort"><span>Ordenar por:</span><select class="sort-select"><option value="newest">Más Nuevo</option><option value="price-asc">Precio: menor a mayor</option><option value="price-desc">Precio: mayor a menor</option></select></div>
   </div>
 </div>
   <div class="cat-layout">
-    <aside class="cat-filters"><div class="filter-group"><button class="filter-group__header">Material <span class="filter-group__icon">+</span></button><div class="filter-group__body"><label class="filter-option"><input type="checkbox"> Aluminio</label><label class="filter-option"><input type="checkbox"> Ratán</label><label class="filter-option"><input type="checkbox"> Teca</label><label class="filter-option"><input type="checkbox"> Hierro</label><label class="filter-option"><input type="checkbox"> Cemento</label></div></div><div class="filter-group"><button class="filter-group__header">Tipo <span class="filter-group__icon">+</span></button><div class="filter-group__body"><label class="filter-option"><input type="checkbox"> Sofás</label><label class="filter-option"><input type="checkbox"> Sillas</label><label class="filter-option"><input type="checkbox"> Mesas</label><label class="filter-option"><input type="checkbox"> Accesorios</label></div></div><div class="filter-group"><button class="filter-group__header">Color <span class="filter-group__icon">+</span></button><div class="filter-group__body"><label class="filter-option"><input type="checkbox"> Negro</label><label class="filter-option"><input type="checkbox"> Gris</label><label class="filter-option"><input type="checkbox"> Blanco</label><label class="filter-option"><input type="checkbox"> Natural</label></div></div><div class="filter-group"><button class="filter-group__header">Precio <span class="filter-group__icon">+</span></button><div class="filter-group__body"></div></div></aside>
+    <aside class="cat-filters"><div class="filter-group"><button class="filter-group__header">Material <span class="filter-group__icon">+</span></button><div class="filter-group__body"><label class="filter-option"><input type="checkbox" data-filter-group="material"> Aluminio</label><label class="filter-option"><input type="checkbox" data-filter-group="material"> Ratán</label><label class="filter-option"><input type="checkbox" data-filter-group="material"> Teca</label><label class="filter-option"><input type="checkbox" data-filter-group="material"> Hierro</label><label class="filter-option"><input type="checkbox" data-filter-group="material"> Cemento</label></div></div><div class="filter-group"><button class="filter-group__header">Tipo <span class="filter-group__icon">+</span></button><div class="filter-group__body"><label class="filter-option"><input type="checkbox" data-filter-group="tipo"> Sofás</label><label class="filter-option"><input type="checkbox" data-filter-group="tipo"> Sillas</label><label class="filter-option"><input type="checkbox" data-filter-group="tipo"> Mesas</label><label class="filter-option"><input type="checkbox" data-filter-group="tipo"> Accesorios</label></div></div><div class="filter-group"><button class="filter-group__header">Color <span class="filter-group__icon">+</span></button><div class="filter-group__body"><label class="filter-option"><input type="checkbox" data-filter-group="color"> Negro</label><label class="filter-option"><input type="checkbox" data-filter-group="color"> Gris</label><label class="filter-option"><input type="checkbox" data-filter-group="color"> Blanco</label><label class="filter-option"><input type="checkbox" data-filter-group="color"> Natural</label></div></div><div class="filter-group">
+  <button class="filter-group__header">Precio <span class="filter-group__icon">+</span></button>
+  <div class="filter-group__body price-range-body">
+    <div class="price-range-row">
+      <div class="price-range-field"><label class="price-range-label">DESDE</label><input type="number" id="priceFrom" class="price-input" placeholder="0" min="0"></div>
+      <div class="price-range-field"><label class="price-range-label">HASTA</label><input type="number" id="priceTo" class="price-input" placeholder="Sin límite" min="0"></div>
+    </div>
+    <button class="price-apply-btn" id="applyPrice">APLICAR</button>
+  </div>
+</div></aside>
     <main class="cat-main"><section class="cat-section">
   <div class="cat-section__header"><h2 class="cat-section__title"><a href="outdoor-mesas-jardin.html" style="color:inherit;text-decoration:none">Mesas de jardín</a></h2><span class="cat-section__count">4 productos</span></div>
   <div class="cat-products-grid"><article class="cat-product" data-price="285000">

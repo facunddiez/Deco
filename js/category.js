@@ -1,18 +1,23 @@
 /* ============================================================
    CASA MATER — Category Page JS
-   Filtros, ordenar, vista, wishlist
    ============================================================ */
 
-// --- Filter accordion ---
+// --- Filter accordion (open/close groups) ---
 document.querySelectorAll('.filter-group__header').forEach(btn => {
   btn.addEventListener('click', function () {
     const group = this.closest('.filter-group');
-    group.classList.toggle('open');
+    const icon  = this.querySelector('.filter-group__icon');
+    const isOpen = group.classList.toggle('open');
+    if (icon) icon.textContent = isOpen ? '×' : '+';
   });
 });
-
-// Abrir primer filtro por defecto
-document.querySelector('.filter-group')?.classList.add('open');
+// Open first filter by default
+const firstGroup = document.querySelector('.filter-group');
+if (firstGroup) {
+  firstGroup.classList.add('open');
+  const icon = firstGroup.querySelector('.filter-group__icon');
+  if (icon) icon.textContent = '×';
+}
 
 // --- Toggle sidebar ---
 const toggleBtn  = document.getElementById('toggleFilters');
@@ -33,32 +38,137 @@ document.querySelectorAll('.view-btn').forEach(btn => {
     this.classList.add('active');
     const cols = this.dataset.view;
     document.querySelectorAll('.cat-products-grid').forEach(grid => {
-      grid.classList.remove('view-2col', 'view-4col');
-      if (cols !== '3') grid.classList.add('view-' + cols + 'col');
+      grid.classList.remove('view-4col', 'view-2col');
+      if (cols === '4') grid.classList.add('view-4col');
+      if (cols === '2') grid.classList.add('view-2col');
     });
   });
 });
 
-// --- Wishlist toggle ---
+// ── Filter engine ─────────────────────────────────────────────────────────────
+
+let priceMin = 0;
+let priceMax = Infinity;
+const totalProducts = document.querySelectorAll('.cat-product').length;
+
+function getCheckedByGroup() {
+  const result = {};
+  document.querySelectorAll('.filter-group').forEach(group => {
+    const header = group.querySelector('.filter-group__header');
+    if (!header) return;
+    const groupName = header.textContent.replace(/[+×]/g, '').trim();
+    // skip price group
+    if (group.querySelector('#priceFrom')) return;
+    const checked = [...group.querySelectorAll('input[type=checkbox]:checked')]
+      .map(cb => cb.closest('label').textContent.trim().toLowerCase());
+    if (checked.length) result[groupName] = checked;
+  });
+  return result;
+}
+
+function applyFilters() {
+  const byGroup = getCheckedByGroup();
+  const hasChecked = Object.keys(byGroup).length > 0;
+
+  document.querySelectorAll('.cat-product').forEach(card => {
+    const price = parseInt(card.dataset.price || 0);
+    const cardText = card.textContent.toLowerCase();
+
+    // Price check
+    let show = price >= priceMin && price <= priceMax;
+
+    // Checkbox check: ALL groups must have at least one match
+    if (show && hasChecked) {
+      for (const [, values] of Object.entries(byGroup)) {
+        const groupMatch = values.some(v => cardText.includes(v));
+        if (!groupMatch) { show = false; break; }
+      }
+    }
+
+    card.style.display = show ? '' : 'none';
+  });
+
+  // Update section visibility + count labels
+  let visibleTotal = 0;
+  document.querySelectorAll('.cat-section').forEach(section => {
+    const visibleCards = [...section.querySelectorAll('.cat-product')]
+      .filter(c => c.style.display !== 'none');
+    section.style.display = visibleCards.length ? '' : 'none';
+    const countEl = section.querySelector('.cat-section__count');
+    if (countEl) countEl.textContent = `${visibleCards.length} producto${visibleCards.length !== 1 ? 's' : ''}`;
+    visibleTotal += visibleCards.length;
+  });
+
+  // Update toolbar count
+  const toolbarCount = document.querySelector('.cat-toolbar__count');
+  if (toolbarCount) {
+    toolbarCount.innerHTML = `Mostrando <strong>${visibleTotal}</strong> de <strong>${totalProducts}</strong> resultados.`;
+  }
+}
+
+// Checkbox change → filter
+document.querySelectorAll('.cat-filters input[type=checkbox]').forEach(cb => {
+  cb.addEventListener('change', applyFilters);
+});
+
+// Price filter
+document.getElementById('applyPrice')?.addEventListener('click', () => {
+  const fromVal = document.getElementById('priceFrom')?.value;
+  const toVal   = document.getElementById('priceTo')?.value;
+  priceMin = fromVal ? parseInt(fromVal) : 0;
+  priceMax = toVal   ? parseInt(toVal)   : Infinity;
+  applyFilters();
+});
+
+// Enter key on price inputs
+['priceFrom', 'priceTo'].forEach(id => {
+  document.getElementById(id)?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('applyPrice')?.click();
+  });
+});
+
+// ── Sort ──────────────────────────────────────────────────────────────────────
+// Save original order on load so "Más Nuevo" can restore it
+const originalOrder = new Map();
+document.querySelectorAll('.cat-products-grid').forEach(grid => {
+  originalOrder.set(grid, [...grid.querySelectorAll('.cat-product')]);
+});
+
+document.querySelector('.sort-select')?.addEventListener('change', function () {
+  document.querySelectorAll('.cat-products-grid').forEach(grid => {
+    const cards = [...grid.querySelectorAll('.cat-product')];
+    if (this.value === 'price-asc') {
+      cards.sort((a, b) => parseInt(a.dataset.price || 0) - parseInt(b.dataset.price || 0));
+    } else if (this.value === 'price-desc') {
+      cards.sort((a, b) => parseInt(b.dataset.price || 0) - parseInt(a.dataset.price || 0));
+    } else {
+      // newest: restore original DOM order
+      const orig = originalOrder.get(grid) || cards;
+      orig.forEach(c => grid.appendChild(c));
+      return;
+    }
+    cards.forEach(c => grid.appendChild(c));
+  });
+});
+
+// ── Wishlist ──────────────────────────────────────────────────────────────────
 document.addEventListener('click', function (e) {
   const btn = e.target.closest('.cat-product__wish-btn');
   if (!btn) return;
   btn.classList.toggle('active');
   const name = btn.closest('.cat-product')?.querySelector('.cat-product__name')?.textContent || 'Producto';
-  const isActive = btn.classList.contains('active');
-  showCatToast(isActive ? `"${name}" guardado en favoritos` : `"${name}" eliminado de favoritos`);
+  showCatToast(btn.classList.contains('active')
+    ? `"${name}" guardado en favoritos`
+    : `"${name}" eliminado de favoritos`);
 });
 
-// --- Add to cart from category ---
+// ── Add to cart ───────────────────────────────────────────────────────────────
 document.addEventListener('click', function (e) {
   const btn = e.target.closest('.cat-product__quick[data-price]');
   if (!btn) return;
-  const card = btn.closest('.cat-product');
+  const card  = btn.closest('.cat-product');
   const name  = card?.querySelector('.cat-product__name')?.textContent || 'Producto';
-  const price = btn.dataset.price || '0';
-  const img   = card?.querySelector('.cat-product__img')?.src || '';
   showCatToast(`"${name}" agregado al carrito`);
-  // Bump cart count
   const countEl = document.getElementById('cartCount');
   if (countEl) {
     countEl.textContent = parseInt(countEl.textContent || 0) + 1;
@@ -66,31 +176,7 @@ document.addEventListener('click', function (e) {
   }
 });
 
-// --- Sort (visual only, no backend) ---
-document.querySelector('.sort-select')?.addEventListener('change', function () {
-  const sections = document.querySelectorAll('.cat-section');
-  sections.forEach(s => {
-    const grid  = s.querySelector('.cat-products-grid');
-    if (!grid) return;
-    const cards = [...grid.querySelectorAll('.cat-product')];
-    if (this.value === 'price-asc') {
-      cards.sort((a, b) => {
-        const pa = parseInt(a.dataset.price || 0);
-        const pb = parseInt(b.dataset.price || 0);
-        return pa - pb;
-      });
-    } else if (this.value === 'price-desc') {
-      cards.sort((a, b) => {
-        const pa = parseInt(a.dataset.price || 0);
-        const pb = parseInt(b.dataset.price || 0);
-        return pb - pa;
-      });
-    }
-    cards.forEach(c => grid.appendChild(c));
-  });
-});
-
-// --- Toast ---
+// ── Toast ─────────────────────────────────────────────────────────────────────
 function showCatToast(msg) {
   let toast = document.getElementById('toast');
   if (!toast) {
@@ -106,8 +192,8 @@ function showCatToast(msg) {
   toast._t = setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
-// --- Scroll reveal ---
-const revealEls = document.querySelectorAll('.cat-product, .cat-section__header, .reveal');
+// ── Scroll reveal ─────────────────────────────────────────────────────────────
+const revealEls = document.querySelectorAll('.cat-product, .cat-section__header');
 const io = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
