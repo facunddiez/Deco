@@ -408,7 +408,13 @@ p { font-size: .9375rem; color: var(--text-secondary); line-height: 1.75; }
   margin-bottom: 14px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border);
+  display: block;
 }
+a.mega-menu__heading--link {
+  text-decoration: none;
+  transition: color var(--transition);
+}
+a.mega-menu__heading--link:hover { color: var(--accent); }
 
 .mega-menu__col ul {
   display: flex;

@@ -21,6 +21,12 @@
   const announce = document.getElementById('announceBar');
   if (!nav) return;
 
+  // On non-home pages always start solid/dark
+  if (document.body.dataset.page !== 'home') {
+    nav.classList.add('scrolled');
+    nav.classList.remove('nav--hero');
+  }
+
   let lastY = 0;
 
   function onScroll() {
@@ -30,7 +36,8 @@
     const isScrolled = y > threshold;
 
     nav.classList.toggle('scrolled', isScrolled);
-    nav.classList.toggle('nav--hero', !isScrolled);
+    const isHome = document.body.dataset.page === 'home';
+    nav.classList.toggle('nav--hero', isHome && !isScrolled);
 
     if (y > 200) {
       nav.style.transform = y > lastY + 4 ? 'translateY(-100%)' : 'translateY(0)';
