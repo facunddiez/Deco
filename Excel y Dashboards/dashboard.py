@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import requests
+import io
 from pathlib import Path
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
@@ -299,7 +300,7 @@ with st.sidebar:
     <hr style='border-color:#333; margin: 0 0 20px;'>
     """, unsafe_allow_html=True)
 
-    tab_sel = st.radio("Sección", ["Categoría", "Productos", "Logística"],
+    tab_sel = st.radio("Sección", ["Categoría", "Productos", "Proveedores", "Reorden", "Logística"],
                        label_visibility="collapsed")
 
     st.markdown("<hr style='border-color:#333; margin: 16px 0;'>", unsafe_allow_html=True)
@@ -338,6 +339,19 @@ with st.sidebar:
         est_p = ["Todos"] + sorted(prod_df["estado"].dropna().unique().tolist())
         est_sel_p = st.selectbox("Estado", est_p, key="prd_est")
 
+    elif tab_sel == "Proveedores":
+        st.markdown("**Filtros**")
+        est_pv = ["Todos"] + sorted(prod_df["estado"].dropna().unique().tolist())
+        est_sel_pv = st.selectbox("Estado producto", est_pv, key="pv_est")
+
+    elif tab_sel == "Reorden":
+        st.markdown("**Umbrales**")
+        dias_critico = st.slider("Días crítico", 5, 30, 15)
+        dias_revisar = st.slider("Días revisar", 15, 60, 30)
+        st.markdown("**Filtros**")
+        cats_ro = ["Todas"] + sorted(prod_df["categoria"].dropna().unique().tolist())
+        cat_sel_ro = st.selectbox("Categoría", cats_ro, key="ro_cat")
+
     else:
         st.markdown("**Filtros**")
 
@@ -370,6 +384,13 @@ with st.sidebar:
         st.rerun()
 
 # ── HELPER ────────────────────────────────────────────────────────────────────
+def export_button(df, filename, label="⬇  Exportar Excel"):
+    buf = io.BytesIO()
+    df.to_excel(buf, index=False)
+    st.download_button(label=label, data=buf.getvalue(),
+                       file_name=filename,
+                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
 def kpi(label, value, color="", suffix="", prefix=""):
     return f"""
     <div class="kpi-card">
@@ -663,6 +684,196 @@ elif tab_sel == "Productos":
         disp["Próx. Orden"] = pd.to_datetime(disp["Próx. Orden"]).dt.strftime("%d/%m/%Y")
         st.dataframe(disp, use_container_width=True, hide_index=True,
                      height=min(500, 38 + n_res * 35))
+        st.markdown("<br>", unsafe_allow_html=True)
+        export_button(dpf[show_cols].rename(columns=dict(zip(show_cols, disp.columns))),
+                      "productos_filtrados.xlsx")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB — PROVEEDORES
+# ══════════════════════════════════════════════════════════════════════════════
+elif tab_sel == "Proveedores":
+    st.markdown('<div class="page-title">Análisis de Proveedores</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-subtitle">Comparativa de rentabilidad, stock y actividad por proveedor</div>', unsafe_allow_html=True)
+
+    dpv = prod_df.copy()
+    if est_sel_pv != "Todos": dpv = dpv[dpv["estado"] == est_sel_pv]
+
+    dpv["stock_bajo"] = (dpv["stock_act"] <= dpv["stock_min"]).astype(int)
+
+    prov_sum = dpv.groupby("proveedor").agg(
+        SKUs          = ("codigo",      "count"),
+        margen_prom   = ("margen",      "mean"),
+        markup_prom   = ("markup",      "mean"),
+        valor_inv     = ("valor_inv",   "sum"),
+        ventas_30d    = ("vendidas_30d","sum"),
+        stock_bajo    = ("stock_bajo",  "sum"),
+        pais          = ("pais",        "first"),
+    ).reset_index().sort_values("valor_inv", ascending=False)
+
+    # ── KPIs ─────────────────────────────────────────────────────────────────
+    n_prov = len(prov_sum)
+    mejor_margen = prov_sum.loc[prov_sum["margen_prom"].idxmax(), "proveedor"]
+    mayor_inv    = prov_sum.loc[prov_sum["valor_inv"].idxmax(),   "proveedor"]
+    total_alerta = int(prov_sum["stock_bajo"].sum())
+
+    cols_pv = st.columns(4, gap="small")
+    for col_, lbl_, val_, clr_ in [
+        (cols_pv[0], "Proveedores",       str(n_prov),        ""),
+        (cols_pv[1], "Mayor Margen",      mejor_margen[:14],  "teal"),
+        (cols_pv[2], "Mayor Inventario",  mayor_inv[:14],     "navy"),
+        (cols_pv[3], "SKUs con Alerta",   str(total_alerta),  "red" if total_alerta else "green"),
+    ]:
+        with col_: st.markdown(kpi(lbl_, val_, clr_), unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── Charts ────────────────────────────────────────────────────────────────
+    section("Rentabilidad")
+    c1v, c2v = st.columns(2, gap="large")
+
+    with c1v:
+        mg_pv = prov_sum.sort_values("margen_prom", ascending=True)
+        mg_pv["color"] = mg_pv["margen_prom"].apply(
+            lambda x: GRN if x >= 0.5 else (ORG if x >= 0.3 else RED))
+        fig_pv1 = px.bar(mg_pv, x="margen_prom", y="proveedor", orientation="h",
+                         title="Margen Bruto Promedio por Proveedor",
+                         color="color", color_discrete_map="identity",
+                         text=mg_pv["margen_prom"].map(lambda x: f"{x:.1%}"))
+        fig_pv1.update_traces(textposition="outside")
+        fig_pv1.update_layout(showlegend=False, xaxis_tickformat=".0%",
+                              xaxis_title="Margen %", yaxis_title="")
+        st.plotly_chart(chart_layout(fig_pv1), use_container_width=True)
+
+    with c2v:
+        fig_pv2 = px.scatter(prov_sum, x="ventas_30d", y="margen_prom",
+                             size="valor_inv", color="proveedor",
+                             hover_name="proveedor",
+                             hover_data={"SKUs": True, "valor_inv": True},
+                             title="Margen vs Ventas  (tamaño = valor inventario)",
+                             color_discrete_sequence=CHART_COLORS)
+        fig_pv2.update_layout(yaxis_tickformat=".0%",
+                              xaxis_title="Ventas 30d (uds)", yaxis_title="Margen %",
+                              legend=dict(orientation="h", yanchor="top", y=-0.18,
+                                          xanchor="center", x=0.5, font=dict(size=10)))
+        st.plotly_chart(chart_layout(fig_pv2), use_container_width=True)
+
+    section("Inventario y Actividad")
+    c3v, c4v = st.columns(2, gap="large")
+
+    with c3v:
+        fig_pv3 = px.bar(prov_sum.sort_values("valor_inv", ascending=False),
+                         x="proveedor", y="valor_inv",
+                         title="Valor de Inventario por Proveedor (ARS)",
+                         color="proveedor", color_discrete_sequence=CHART_COLORS,
+                         text=prov_sum.sort_values("valor_inv", ascending=False)
+                              ["valor_inv"].map(lambda x: f"${x/1_000_000:.1f}M"))
+        fig_pv3.update_traces(textposition="outside")
+        fig_pv3.update_layout(showlegend=False, xaxis_title="", yaxis_title="ARS")
+        st.plotly_chart(chart_layout(fig_pv3), use_container_width=True)
+
+    with c4v:
+        fig_pv4 = go.Figure()
+        fig_pv4.add_trace(go.Bar(name="SKUs totales", x=prov_sum["proveedor"],
+                                  y=prov_sum["SKUs"], marker_color=NAVY))
+        fig_pv4.add_trace(go.Bar(name="SKUs con alerta", x=prov_sum["proveedor"],
+                                  y=prov_sum["stock_bajo"], marker_color=RED, opacity=0.8))
+        fig_pv4.update_layout(title="SKUs totales vs con Alerta de Stock",
+                               barmode="overlay", xaxis_title="", yaxis_title="SKUs",
+                               legend=dict(orientation="h", yanchor="top", y=-0.15,
+                                           xanchor="center", x=0.5))
+        st.plotly_chart(chart_layout(fig_pv4), use_container_width=True)
+
+    section("Tabla Resumen")
+    disp_pv = prov_sum[["proveedor","pais","SKUs","margen_prom","markup_prom",
+                         "valor_inv","ventas_30d","stock_bajo"]].copy()
+    disp_pv.columns = ["Proveedor","País","SKUs","Margen %","Markup %",
+                        "Valor Inv. ARS","Ventas 30d","Alertas Stock"]
+    disp_pv["Margen %"]      = disp_pv["Margen %"].map(lambda x: f"{x:.1%}")
+    disp_pv["Markup %"]      = disp_pv["Markup %"].map(lambda x: f"{x:.1%}")
+    disp_pv["Valor Inv. ARS"] = disp_pv["Valor Inv. ARS"].map(lambda x: f"${x:,.0f}")
+    st.dataframe(disp_pv, use_container_width=True, hide_index=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    export_button(disp_pv, "proveedores.xlsx")
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB — REORDEN
+# ══════════════════════════════════════════════════════════════════════════════
+elif tab_sel == "Reorden":
+    st.markdown('<div class="page-title">Panel de Reorden</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-subtitle">Días de stock restantes · Urgencia de compra · Próximas órdenes</div>', unsafe_allow_html=True)
+
+    dro = prod_df.copy()
+    if cat_sel_ro != "Todas": dro = dro[dro["categoria"] == cat_sel_ro]
+
+    dro["ventas_dia"] = dro["vendidas_30d"] / 30
+    dro["dias_stock"] = dro.apply(
+        lambda r: round(r["stock_act"] / r["ventas_dia"]) if r["ventas_dia"] > 0 else 999, axis=1)
+    dro["urgencia"] = dro["dias_stock"].apply(
+        lambda x: "SIN MOVIMIENTO" if x == 999
+        else ("CRÍTICO"   if x < dias_critico
+        else ("REVISAR"   if x < dias_revisar
+        else  "OK")))
+    dro["color_urg"] = dro["urgencia"].map(
+        {"CRÍTICO": RED, "REVISAR": ORG, "OK": GRN, "SIN MOVIMIENTO": GRAY})
+
+    criticos = int((dro["urgencia"] == "CRÍTICO").sum())
+    revisar  = int((dro["urgencia"] == "REVISAR").sum())
+    ok       = int((dro["urgencia"] == "OK").sum())
+    sin_mov  = int((dro["urgencia"] == "SIN MOVIMIENTO").sum())
+
+    # ── KPIs ─────────────────────────────────────────────────────────────────
+    cols_ro = st.columns(4, gap="small")
+    for col_, lbl_, val_, clr_ in [
+        (cols_ro[0], f"Crítico  (< {dias_critico}d)",    str(criticos), "red"   if criticos else "green"),
+        (cols_ro[1], f"Revisar  ({dias_critico}–{dias_revisar}d)", str(revisar),  "orange" if revisar  else "green"),
+        (cols_ro[2], "Stock OK",                          str(ok),       "green"),
+        (cols_ro[3], "Sin movimiento",                    str(sin_mov),  ""),
+    ]:
+        with col_: st.markdown(kpi(lbl_, val_, clr_), unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── Urgency chart ────────────────────────────────────────────────────────
+    section("Días de Stock por Producto")
+    activos_ro = dro[dro["urgencia"] != "SIN MOVIMIENTO"].sort_values("dias_stock")
+    if len(activos_ro) > 0:
+        activos_ro["label"] = activos_ro["codigo"] + "  " + activos_ro["nombre"].str[:22]
+        activos_ro["dias_display"] = activos_ro["dias_stock"].clip(upper=90)
+
+        fig_ro = px.bar(activos_ro, x="dias_display", y="label", orientation="h",
+                        title="Días de Stock Restantes (productos con movimiento)",
+                        color="color_urg", color_discrete_map="identity",
+                        text=activos_ro["dias_stock"].map(
+                            lambda x: f"{int(x)}d" if x < 90 else "90d+"))
+        fig_ro.update_traces(textposition="outside")
+        fig_ro.add_vline(x=dias_critico, line_dash="dash", line_color=RED,
+                         annotation_text=f"Crítico ({dias_critico}d)",
+                         annotation_position="top right")
+        fig_ro.add_vline(x=dias_revisar, line_dash="dash", line_color=ORG,
+                         annotation_text=f"Revisar ({dias_revisar}d)",
+                         annotation_position="top right")
+        fig_ro.update_layout(showlegend=False, xaxis_title="Días de stock",
+                             yaxis_title="")
+        st.plotly_chart(chart_layout(fig_ro, height=max(350, len(activos_ro)*30+80)),
+                        use_container_width=True)
+
+    # ── Reorder table ────────────────────────────────────────────────────────
+    section("Lista de Reorden Priorizada")
+    dro_disp = dro.sort_values("dias_stock")[
+        ["codigo","nombre","categoria","proveedor","stock_act","stock_min",
+         "vendidas_30d","dias_stock","urgencia","prox_orden","pvp"]
+    ].copy()
+    dro_disp.columns = ["Código","Nombre","Categoría","Proveedor","Stock Act.",
+                        "Stock Mín.","Ventas 30d","Días Stock","Urgencia",
+                        "Próx. Orden","PVP ARS"]
+    dro_disp["Días Stock"] = dro_disp["Días Stock"].map(
+        lambda x: "Sin movimiento" if x == 999 else f"{int(x)}d")
+    dro_disp["Próx. Orden"] = pd.to_datetime(dro_disp["Próx. Orden"]).dt.strftime("%d/%m/%Y")
+    dro_disp["PVP ARS"]     = dro_disp["PVP ARS"].map(lambda x: f"${x:,.0f}")
+    st.dataframe(dro_disp, use_container_width=True, hide_index=True,
+                 height=min(500, 38 + len(dro_disp)*35))
+    st.markdown("<br>", unsafe_allow_html=True)
+    export_button(dro_disp, "panel_reorden.xlsx")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB — LOGÍSTICA
@@ -792,3 +1003,5 @@ elif tab_sel == "Logística":
     disp_l["Landed ARS"]     = disp_l["Landed ARS"].map(lambda x: f"${x:,.0f}")
     st.dataframe(disp_l, use_container_width=True, hide_index=True,
                  height=min(400, 38 + len(disp_l)*35))
+    st.markdown("<br>", unsafe_allow_html=True)
+    export_button(disp_l, "logistica.xlsx")
