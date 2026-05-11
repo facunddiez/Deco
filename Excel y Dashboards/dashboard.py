@@ -170,7 +170,11 @@ def get_excel_path():
         dest = "/tmp/Costos_Importacion.xlsx"
         gdown.download(id=GDRIVE_FILE_ID, output=dest, quiet=True)
         return dest
-    return str(LOCAL_EXCEL)
+    if LOCAL_EXCEL.exists():
+        return str(LOCAL_EXCEL)
+    st.error("⚙️ **Configuración pendiente:** agregá el `gdrive_file_id` en los Secrets de Streamlit Cloud.")
+    st.info("Ir a: tu app → ⋮ → Settings → Secrets → agregar `gdrive_file_id = \"ID_del_archivo\"`")
+    st.stop()
 
 @st.cache_data(ttl=300)
 def load_data():
