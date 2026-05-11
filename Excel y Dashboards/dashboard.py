@@ -299,12 +299,12 @@ with st.sidebar:
     <hr style='border-color:#333; margin: 0 0 20px;'>
     """, unsafe_allow_html=True)
 
-    tab_sel = st.radio("Sección", ["Productos", "Logística"],
+    tab_sel = st.radio("Sección", ["Categoría", "Productos", "Logística"],
                        label_visibility="collapsed")
 
     st.markdown("<hr style='border-color:#333; margin: 16px 0;'>", unsafe_allow_html=True)
 
-    if tab_sel == "Productos":
+    if tab_sel == "Categoría":
         st.markdown("**Filtros**")
 
         min_date = prod_df["ult_recepcion"].dropna().min().date()
@@ -325,6 +325,18 @@ with st.sidebar:
 
         estados = ["Todos"] + sorted(prod_df["estado"].dropna().unique().tolist())
         est_sel = st.selectbox("Estado", estados)
+
+    elif tab_sel == "Productos":
+        st.markdown("**Buscar**")
+        search_q = st.text_input("Nombre o SKU", placeholder="Ej: DEC-001 o Mesa...",
+                                 label_visibility="collapsed")
+        st.markdown("**Filtros**")
+        cats_p = ["Todas"] + sorted(prod_df["categoria"].dropna().unique().tolist())
+        cat_sel_p = st.selectbox("Categoría", cats_p, key="prd_cat")
+        provs_p = ["Todos"] + sorted(prod_df["proveedor"].dropna().unique().tolist())
+        prov_sel_p = st.selectbox("Proveedor", provs_p, key="prd_prov")
+        est_p = ["Todos"] + sorted(prod_df["estado"].dropna().unique().tolist())
+        est_sel_p = st.selectbox("Estado", est_p, key="prd_est")
 
     else:
         st.markdown("**Filtros**")
@@ -382,10 +394,10 @@ def chart_layout(fig, height=340):
     return fig
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB — PRODUCTOS
+# TAB — CATEGORÍA
 # ══════════════════════════════════════════════════════════════════════════════
-if tab_sel == "Productos":
-    st.markdown('<div class="page-title">Productos &amp; Costos</div>', unsafe_allow_html=True)
+if tab_sel == "Categoría":
+    st.markdown('<div class="page-title">Análisis por Categoría</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="page-subtitle">Recepción: {date_desde.strftime("%d/%m/%Y")} → {date_hasta.strftime("%d/%m/%Y")}  ·  {cat_sel}  ·  {prov_sel}</div>', unsafe_allow_html=True)
 
     # ── Filter ──────────────────────────────────────────────────────────────
@@ -506,27 +518,145 @@ if tab_sel == "Productos":
                 f"Actual: <b>{int(row['stock_act'])}</b> &nbsp;·&nbsp; Mínimo: {int(row['stock_min'])}",
                 unsafe_allow_html=True)
 
-    # ── Data table ────────────────────────────────────────────────────────────
-    section("Detalle de Productos")
-    show_cols = ["codigo","nombre","categoria","proveedor",
-                 "fob_unit","costo_landed","costo_ars","pvp",
-                 "margen","stock_act","vendidas_30d","estado"]
-    disp = df[show_cols].copy()
-    disp.columns = ["Código","Nombre","Categoría","Proveedor",
-                    "FOB USD","Landed USD","Costo ARS","PVP ARS",
-                    "Margen %","Stock","Ventas 30d","Estado"]
-    disp["Margen %"] = disp["Margen %"].map(lambda x: f"{x:.1%}")
-    disp["FOB USD"]  = disp["FOB USD"].map(lambda x: f"${x:,.2f}")
-    disp["Landed USD"] = disp["Landed USD"].map(lambda x: f"${x:,.2f}")
-    disp["Costo ARS"] = disp["Costo ARS"].map(lambda x: f"${x:,.0f}")
-    disp["PVP ARS"]   = disp["PVP ARS"].map(lambda x: f"${x:,.0f}")
-    st.dataframe(disp, use_container_width=True, hide_index=True,
-                 height=min(400, 38 + len(disp)*35))
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB — PRODUCTOS
+# ══════════════════════════════════════════════════════════════════════════════
+elif tab_sel == "Productos":
+
+    # ── Filter ────────────────────────────────────────────────────────────────
+    dpf = prod_df.copy()
+    if search_q:
+        q = search_q.lower()
+        dpf = dpf[dpf["codigo"].str.lower().str.contains(q, na=False) |
+                  dpf["nombre"].str.lower().str.contains(q, na=False)]
+    if cat_sel_p  != "Todas":  dpf = dpf[dpf["categoria"] == cat_sel_p]
+    if prov_sel_p != "Todos":  dpf = dpf[dpf["proveedor"] == prov_sel_p]
+    if est_sel_p  != "Todos":  dpf = dpf[dpf["estado"]    == est_sel_p]
+
+    n_res = len(dpf)
+    subtitle = f"{n_res} producto{'s' if n_res != 1 else ''} encontrado{'s' if n_res != 1 else ''}"
+    if search_q: subtitle += f"  ·  Búsqueda: \"{search_q}\""
+
+    st.markdown('<div class="page-title">Detalle por Producto</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="page-subtitle">{subtitle}</div>', unsafe_allow_html=True)
+
+    if n_res == 0:
+        st.info("No se encontraron productos con ese criterio.")
+    else:
+        # ── KPIs ─────────────────────────────────────────────────────────────
+        margen_p   = dpf["margen"].mean()
+        valor_p    = dpf["valor_inv"].sum()
+        ventas_p   = int(dpf["vendidas_30d"].sum())
+        bajo_p     = int(((dpf["stock_act"] <= dpf["stock_min"]) & (dpf["stock_act"] > 0)).sum())
+        sin_p      = int((dpf["stock_act"] == 0).sum())
+        markup_p   = dpf["markup"].mean()
+
+        cols_p = st.columns(6, gap="small")
+        cards_p = [
+            (cols_p[0], "SKUs",            f"{n_res}",                   ""),
+            (cols_p[1], "Valor Inventario", f"${valor_p/1_000_000:.1f}M",""),
+            (cols_p[2], "Margen Prom.",    f"{margen_p:.0%}",            "teal" if margen_p >= 0.4 else ("" if margen_p >= 0.3 else "red")),
+            (cols_p[3], "Markup Prom.",    f"{markup_p:.0%}",            "navy"),
+            (cols_p[4], "Stock Bajo",      f"{bajo_p}",                  "orange" if bajo_p > 0 else "green"),
+            (cols_p[5], "Ventas 30d",      f"{ventas_p} uds",            "green"),
+        ]
+        for col_, label_, val_, color_ in cards_p:
+            with col_:
+                st.markdown(kpi(label_, val_, color_), unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # ── Charts row 1 ─────────────────────────────────────────────────────
+        section("Rentabilidad por Producto")
+        c1p, c2p = st.columns(2, gap="large")
+
+        with c1p:
+            mg_prod = dpf.sort_values("margen", ascending=True).copy()
+            mg_prod["color"] = mg_prod["margen"].apply(
+                lambda x: GRN if x >= 0.5 else (ORG if x >= 0.3 else RED))
+            mg_prod["label"] = mg_prod["codigo"] + "  " + mg_prod["nombre"].str[:22]
+            fig_mg = px.bar(mg_prod, x="margen", y="label", orientation="h",
+                            title="Margen Bruto por Producto",
+                            color="color", color_discrete_map="identity",
+                            text=mg_prod["margen"].map(lambda x: f"{x:.1%}"))
+            fig_mg.update_traces(textposition="outside")
+            fig_mg.update_layout(showlegend=False, xaxis_title="Margen %",
+                                 yaxis_title="", xaxis_tickformat=".0%")
+            st.plotly_chart(chart_layout(fig_mg, height=max(320, n_res * 32 + 60)),
+                            use_container_width=True)
+
+        with c2p:
+            fig_sc = px.scatter(dpf,
+                                x="vendidas_30d", y="margen",
+                                size="valor_inv", color="categoria",
+                                hover_name="nombre",
+                                hover_data={"codigo": True, "pvp": True,
+                                            "valor_inv": True, "vendidas_30d": True},
+                                title="Margen vs Ventas 30d  (tamaño = valor inventario)",
+                                color_discrete_sequence=CHART_COLORS)
+            fig_sc.update_layout(yaxis_tickformat=".0%", xaxis_title="Unidades vendidas 30d",
+                                 yaxis_title="Margen %")
+            st.plotly_chart(chart_layout(fig_sc), use_container_width=True)
+
+        # ── Charts row 2 ─────────────────────────────────────────────────────
+        section("Stock e Inventario")
+        c3p, c4p = st.columns(2, gap="large")
+
+        with c3p:
+            stk_prod = dpf.sort_values("stock_act", ascending=False).copy()
+            stk_prod["label"] = stk_prod["codigo"] + " · " + stk_prod["nombre"].str[:18]
+            fig_stk = go.Figure()
+            fig_stk.add_trace(go.Bar(name="Stock Actual", y=stk_prod["label"],
+                                     x=stk_prod["stock_act"], orientation="h",
+                                     marker_color=NAVY))
+            fig_stk.add_trace(go.Bar(name="Stock Mínimo", y=stk_prod["label"],
+                                     x=stk_prod["stock_min"], orientation="h",
+                                     marker_color=RED, opacity=0.7))
+            fig_stk.update_layout(title="Stock Actual vs Mínimo",
+                                  barmode="overlay", xaxis_title="Unidades", yaxis_title="")
+            st.plotly_chart(chart_layout(fig_stk, height=max(320, n_res * 32 + 60)),
+                            use_container_width=True)
+
+        with c4p:
+            inv_prod = dpf.sort_values("valor_inv", ascending=False).copy()
+            inv_prod["label"] = inv_prod["codigo"]
+            fig_inv = px.bar(inv_prod, x="label", y="valor_inv",
+                             title="Valor de Inventario por Producto (ARS)",
+                             color="categoria", color_discrete_sequence=CHART_COLORS,
+                             text=inv_prod["valor_inv"].map(lambda x: f"${x/1000:.0f}K"))
+            fig_inv.update_traces(textposition="outside")
+            fig_inv.update_layout(xaxis_title="", yaxis_title="ARS",
+                                  yaxis_tickformat=",.0f")
+            st.plotly_chart(chart_layout(fig_inv), use_container_width=True)
+
+        # ── Detail table ─────────────────────────────────────────────────────
+        section("Ficha de Productos")
+        show_cols = ["codigo","nombre","categoria","proveedor","pais",
+                     "fob_unit","imp_unit","costo_landed","costo_ars","pvp",
+                     "margen","markup","stock_act","stock_min","vendidas_30d",
+                     "valor_inv","ult_recepcion","prox_orden","estado","id_embarque"]
+        disp = dpf[show_cols].copy()
+        disp.columns = ["Código","Nombre","Categoría","Proveedor","País",
+                        "FOB USD","Imp. USD","Landed USD","Costo ARS","PVP ARS",
+                        "Margen %","Markup %","Stock","Stk. Mín","Ventas 30d",
+                        "Valor Inv.","Últ. Recep.","Próx. Orden","Estado","Embarque"]
+        disp["Margen %"]   = disp["Margen %"].map(lambda x: f"{x:.1%}")
+        disp["Markup %"]   = disp["Markup %"].map(lambda x: f"{x:.1%}")
+        disp["FOB USD"]    = disp["FOB USD"].map(lambda x: f"${x:,.2f}")
+        disp["Imp. USD"]   = disp["Imp. USD"].map(lambda x: f"${x:,.2f}")
+        disp["Landed USD"] = disp["Landed USD"].map(lambda x: f"${x:,.2f}")
+        disp["Costo ARS"]  = disp["Costo ARS"].map(lambda x: f"${x:,.0f}")
+        disp["PVP ARS"]    = disp["PVP ARS"].map(lambda x: f"${x:,.0f}")
+        disp["Valor Inv."] = disp["Valor Inv."].map(lambda x: f"${x:,.0f}")
+        disp["Últ. Recep."] = pd.to_datetime(disp["Últ. Recep."]).dt.strftime("%d/%m/%Y")
+        disp["Próx. Orden"] = pd.to_datetime(disp["Próx. Orden"]).dt.strftime("%d/%m/%Y")
+        st.dataframe(disp, use_container_width=True, hide_index=True,
+                     height=min(500, 38 + n_res * 35))
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB — LOGÍSTICA
 # ══════════════════════════════════════════════════════════════════════════════
-else:
+elif tab_sel == "Logística":
     st.markdown('<div class="page-title">Logística &amp; Importación</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="page-subtitle">Órdenes: {date_desde_l.strftime("%d/%m/%Y")} → {date_hasta_l.strftime("%d/%m/%Y")}  ·  {prov_sel_l}  ·  {est_sel_l}</div>', unsafe_allow_html=True)
 
