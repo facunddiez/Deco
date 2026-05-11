@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import gdown
+import requests
 from pathlib import Path
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
@@ -167,8 +167,14 @@ if not st.session_state.get("auth"):
 # ── DATA LOADING ──────────────────────────────────────────────────────────────
 def get_excel_path():
     if GDRIVE_FILE_ID:
+        url  = f"https://docs.google.com/spreadsheets/d/{GDRIVE_FILE_ID}/export?format=xlsx"
+        resp = requests.get(url, timeout=30)
+        if resp.status_code != 200:
+            st.error("No se pudo descargar el archivo. Verificá que el Google Sheet esté compartido como 'Cualquier persona con el enlace'.")
+            st.stop()
         dest = "/tmp/Costos_Importacion.xlsx"
-        gdown.download(id=GDRIVE_FILE_ID, output=dest, quiet=True)
+        with open(dest, "wb") as f:
+            f.write(resp.content)
         return dest
     if LOCAL_EXCEL.exists():
         return str(LOCAL_EXCEL)
