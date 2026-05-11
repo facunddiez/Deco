@@ -531,6 +531,65 @@ if tab_sel == "Categoría":
                            xaxis_title="", yaxis_title="Unidades")
         st.plotly_chart(chart_layout(fig4), use_container_width=True)
 
+    # ── Semáforo de salud por categoría ──────────────────────────────────────
+    section("Semáforo de Salud por Categoría")
+    cat_health = []
+    for cat in sorted(df_all["categoria"].dropna().unique()):
+        sub = df_all[df_all["categoria"] == cat]
+        mg  = sub["margen"].mean() if len(sub) > 0 else 0
+        rot = sub["vendidas_30d"].sum() / sub["stock_act"].replace(0, float("nan")).sum() if sub["stock_act"].sum() > 0 else 0
+        alertas_cat = int((sub["stock_act"] <= sub["stock_min"]).sum())
+        # Score 0-6
+        s_mg  = 2 if mg >= 0.5 else (1 if mg >= 0.3 else 0)
+        s_rot = 2 if rot >= 0.3 else (1 if rot >= 0.1 else 0)
+        s_stk = 2 if alertas_cat == 0 else (1 if alertas_cat <= 1 else 0)
+        score = s_mg + s_rot + s_stk
+        color = GRN if score >= 5 else (ORG if score >= 3 else RED)
+        label = "Saludable" if score >= 5 else ("Atención" if score >= 3 else "Crítico")
+        cat_health.append({"cat": cat, "score": score, "color": color, "label": label,
+                           "margen": mg, "rotacion": rot, "alertas": alertas_cat, "skus": len(sub)})
+
+    cols_h = st.columns(len(cat_health), gap="small")
+    for col_, h in zip(cols_h, cat_health):
+        with col_:
+            st.markdown(f"""
+            <div style='background:{DARK};border-top:4px solid {h["color"]};
+                        border-radius:8px;padding:14px 10px;text-align:center;'>
+              <div style='font-size:0.65rem;color:#aaa;letter-spacing:0.08em;
+                          text-transform:uppercase;margin-bottom:4px;'>{h["cat"]}</div>
+              <div style='font-family:"Playfair Display",serif;font-size:1.5rem;
+                          color:{h["color"]};'>{h["score"]}/6</div>
+              <div style='font-size:0.7rem;color:{h["color"]};font-weight:600;
+                          margin:4px 0;'>{h["label"]}</div>
+              <div style='font-size:0.65rem;color:#888;line-height:1.6;'>
+                Margen {h["margen"]:.0%} · {h["skus"]} SKUs<br>
+                {"⚠ " + str(h["alertas"]) + " alertas" if h["alertas"] else "Stock OK"}
+              </div>
+            </div>""", unsafe_allow_html=True)
+
+    # ── Tabla comparativa de categorías ──────────────────────────────────────
+    section("Comparativa de Categorías")
+    cat_comp = (df_all.groupby("categoria").agg(
+        SKUs          = ("codigo",       "count"),
+        margen_prom   = ("margen",       "mean"),
+        markup_prom   = ("markup",       "mean"),
+        valor_inv     = ("valor_inv",    "sum"),
+        ventas_30d    = ("vendidas_30d", "sum"),
+        stock_total   = ("stock_act",    "sum"),
+    ).reset_index().sort_values("valor_inv", ascending=False))
+    cat_comp["Rotación"]   = (cat_comp["ventas_30d"] / cat_comp["stock_total"].replace(0, float("nan"))).fillna(0)
+    cat_comp_disp = cat_comp.rename(columns={
+        "categoria":"Categoría","SKUs":"SKUs","margen_prom":"Margen %",
+        "markup_prom":"Markup %","valor_inv":"Valor Inv. ARS",
+        "ventas_30d":"Ventas 30d","stock_total":"Stock Total"})
+    cat_comp_disp["Margen %"]      = cat_comp_disp["Margen %"].map(lambda x: f"{x:.1%}")
+    cat_comp_disp["Markup %"]      = cat_comp_disp["Markup %"].map(lambda x: f"{x:.1%}")
+    cat_comp_disp["Valor Inv. ARS"]= cat_comp_disp["Valor Inv. ARS"].map(lambda x: f"${x:,.0f}")
+    cat_comp_disp["Rotación"]      = cat_comp_disp["Rotación"].map(lambda x: f"{x:.1%}")
+    st.dataframe(cat_comp_disp[["Categoría","SKUs","Margen %","Markup %","Valor Inv. ARS",
+                                 "Ventas 30d","Stock Total","Rotación"]],
+                 use_container_width=True, hide_index=True)
+
     # ── Alerts ───────────────────────────────────────────────────────────────
     alertas = df_all[df_all["stock_act"] <= df_all["stock_min"]].copy()
     if len(alertas) > 0:
@@ -684,6 +743,101 @@ elif tab_sel == "Productos":
         st.markdown("<br>", unsafe_allow_html=True)
         export_button(dpf[show_cols].rename(columns=dict(zip(show_cols, disp.columns))),
                       "productos_filtrados.xlsx")
+
+        # ── Simulador Tipo de Cambio ─────────────────────────────────────────
+        section("Simulador de Tipo de Cambio")
+        tc_actual = dpf["tc"].mean() if dpf["tc"].mean() > 0 else 1200
+        c_sl1, c_sl2 = st.columns([3, 1])
+        with c_sl1:
+            tc_sim = st.slider("Tipo de cambio ARS/USD", min_value=500,
+                               max_value=int(tc_actual * 2.5), value=int(tc_actual),
+                               step=25, format="$%d")
+        with c_sl2:
+            delta_tc = (tc_sim - tc_actual) / tc_actual
+            st.markdown(f"""
+            <div style='background:{DARK};border-radius:8px;padding:12px;text-align:center;margin-top:8px;'>
+              <div style='font-size:0.65rem;color:#aaa;'>Δ vs actual</div>
+              <div style='font-size:1.3rem;color:{"#E74C3C" if delta_tc>0 else "#52BE80"};font-weight:700;'>
+                {delta_tc:+.1%}</div>
+            </div>""", unsafe_allow_html=True)
+
+        sim = dpf.copy()
+        sim["costo_ars_sim"] = sim["costo_landed"] * tc_sim
+        sim["margen_sim"]    = ((sim["pvp"] - sim["costo_ars_sim"]) / sim["pvp"]).clip(-1, 1)
+        sim["delta_margen"]  = sim["margen_sim"] - sim["margen"]
+        sim["label"]         = sim["codigo"] + "  " + sim["nombre"].str[:20]
+
+        c_sim1, c_sim2 = st.columns(2, gap="large")
+        with c_sim1:
+            fig_sim = go.Figure()
+            fig_sim.add_trace(go.Bar(name="Margen Actual", x=sim["label"],
+                                      y=sim["margen"], marker_color=NAVY, opacity=0.6))
+            fig_sim.add_trace(go.Bar(name=f"Margen a ${tc_sim:,}", x=sim["label"],
+                                      y=sim["margen_sim"], marker_color=GOLD))
+            fig_sim.update_layout(title="Margen actual vs simulado por producto",
+                                   barmode="overlay", xaxis_title="", yaxis_title="Margen %",
+                                   yaxis_tickformat=".0%",
+                                   legend=dict(orientation="h", yanchor="top", y=-0.18,
+                                               xanchor="center", x=0.5))
+            st.plotly_chart(chart_layout(fig_sim), use_container_width=True)
+
+        with c_sim2:
+            sim_sorted = sim.sort_values("delta_margen")
+            colors_sim = sim_sorted["delta_margen"].apply(lambda x: GRN if x >= 0 else RED)
+            fig_delta = px.bar(sim_sorted, x="delta_margen", y="label", orientation="h",
+                               title="Impacto en margen por producto",
+                               color=colors_sim, color_discrete_map="identity",
+                               text=sim_sorted["delta_margen"].map(lambda x: f"{x:+.1%}"))
+            fig_delta.update_traces(textposition="outside")
+            fig_delta.update_layout(showlegend=False, xaxis_tickformat=".0%",
+                                    xaxis_title="Δ Margen", yaxis_title="")
+            st.plotly_chart(chart_layout(fig_delta), use_container_width=True)
+
+        # ── Comparador de Productos ───────────────────────────────────────────
+        section("Comparador de Productos")
+        opciones = (dpf["codigo"] + " — " + dpf["nombre"]).tolist()
+        seleccion = st.multiselect("Seleccioná hasta 4 productos para comparar",
+                                   opciones, max_selections=4,
+                                   placeholder="Escribí un código o nombre...")
+        if len(seleccion) >= 2:
+            codigos_sel = [s.split(" — ")[0] for s in seleccion]
+            comp = dpf[dpf["codigo"].isin(codigos_sel)].copy()
+
+            metricas = ["FOB USD","Landed USD","Costo ARS","PVP ARS","Margen %","Markup %","Stock","Ventas 30d"]
+            comp_tbl = comp[["codigo","nombre","fob_unit","costo_landed","costo_ars",
+                              "pvp","margen","markup","stock_act","vendidas_30d"]].copy()
+            comp_tbl.columns = ["Código","Nombre"] + metricas
+            comp_tbl["FOB USD"]    = comp_tbl["FOB USD"].map(lambda x: f"${x:,.2f}")
+            comp_tbl["Landed USD"] = comp_tbl["Landed USD"].map(lambda x: f"${x:,.2f}")
+            comp_tbl["Costo ARS"]  = comp_tbl["Costo ARS"].map(lambda x: f"${x:,.0f}")
+            comp_tbl["PVP ARS"]    = comp_tbl["PVP ARS"].map(lambda x: f"${x:,.0f}")
+            comp_tbl["Margen %"]   = comp_tbl["Margen %"].map(lambda x: f"{x:.1%}")
+            comp_tbl["Markup %"]   = comp_tbl["Markup %"].map(lambda x: f"{x:.1%}")
+            st.dataframe(comp_tbl, use_container_width=True, hide_index=True)
+
+            # Radar chart
+            cats_radar = ["Margen","Markup","Rotación","PVP Relativo","Stock Relativo"]
+            max_pvp = comp["pvp"].max(); max_stk = comp["stock_act"].max()
+            fig_rad = go.Figure()
+            for _, row in comp.iterrows():
+                rot_norm = min((row["vendidas_30d"] / row["stock_act"]) / 0.5, 1) if row["stock_act"] > 0 else 0
+                vals = [
+                    min(row["margen"], 1),
+                    min(row["markup"] / 2, 1),
+                    rot_norm,
+                    row["pvp"] / max_pvp if max_pvp > 0 else 0,
+                    row["stock_act"] / max_stk if max_stk > 0 else 0,
+                ]
+                fig_rad.add_trace(go.Scatterpolar(
+                    r=vals + [vals[0]], theta=cats_radar + [cats_radar[0]],
+                    fill="toself", name=row["codigo"], opacity=0.6))
+            fig_rad.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0,1])),
+                                   title="Radar comparativo",
+                                   legend=dict(orientation="h", yanchor="top", y=-0.12,
+                                               xanchor="center", x=0.5))
+            st.plotly_chart(chart_layout(fig_rad), use_container_width=True)
+        elif len(seleccion) == 1:
+            st.info("Seleccioná al menos 2 productos para comparar.")
 
         # ── Panel de Reorden ─────────────────────────────────────────────────
         section("Panel de Reorden")
@@ -982,3 +1136,62 @@ elif tab_sel == "Logística":
                  height=min(400, 38 + len(disp_l)*35))
     st.markdown("<br>", unsafe_allow_html=True)
     export_button(disp_l, "logistica.xlsx")
+
+    # ── Gantt de embarques ────────────────────────────────────────────────────
+    section("Timeline de Embarques")
+    gantt_df = dl[["id","fecha_orden","eta","arribo_real","proveedor","estado"]].copy()
+    gantt_df["fin"] = gantt_df["arribo_real"].fillna(gantt_df["eta"])
+    gantt_df = gantt_df.dropna(subset=["fecha_orden","fin"])
+    if len(gantt_df) > 0:
+        fig_gantt = px.timeline(
+            gantt_df, x_start="fecha_orden", x_end="fin", y="id",
+            color="estado", title="Embarques: Orden → Arribo",
+            hover_data={"proveedor": True, "fecha_orden": True, "fin": True},
+            color_discrete_map={"Liquidado": GRN, "En tránsito": ORG,
+                                "Pendiente": GRAY, "En aduana": NAVY})
+        fig_gantt.update_yaxes(autorange="reversed")
+        fig_gantt.update_layout(xaxis_title="", yaxis_title="",
+                                 legend=dict(orientation="h", yanchor="top", y=-0.15,
+                                             xanchor="center", x=0.5))
+        st.plotly_chart(chart_layout(fig_gantt, height=max(280, len(gantt_df)*50+80)),
+                        use_container_width=True)
+    else:
+        st.info("No hay suficientes fechas para mostrar el timeline.")
+
+    # ── Proyección de costos ──────────────────────────────────────────────────
+    section("Evolución del Costo de Importación")
+    evo = dl.dropna(subset=["fecha_orden"]).sort_values("fecha_orden").copy()
+    if len(evo) >= 2:
+        c_evo1, c_evo2 = st.columns(2, gap="large")
+        with c_evo1:
+            fig_evo = go.Figure()
+            fig_evo.add_trace(go.Bar(name="% Costos s/FOB", x=evo["id"],
+                                      y=evo["pct_costos"], marker_color=GOLD,
+                                      text=evo["pct_costos"].map(lambda x: f"{x:.0%}"),
+                                      textposition="outside"))
+            media_mov = evo["pct_costos"].expanding().mean()
+            fig_evo.add_trace(go.Scatter(name="Promedio acumulado", x=evo["id"],
+                                          y=media_mov, mode="lines+markers",
+                                          line=dict(color=RED, width=2, dash="dot")))
+            fig_evo.update_layout(title="% Costos sobre FOB por embarque (cronológico)",
+                                   yaxis_tickformat=".0%", xaxis_title="", yaxis_title="%",
+                                   legend=dict(orientation="h", yanchor="top", y=-0.15,
+                                               xanchor="center", x=0.5))
+            st.plotly_chart(chart_layout(fig_evo), use_container_width=True)
+
+        with c_evo2:
+            fig_evo2 = go.Figure()
+            fig_evo2.add_trace(go.Bar(name="Total Landed USD", x=evo["id"],
+                                       y=evo["total_landed"], marker_color=NAVY,
+                                       text=evo["total_landed"].map(lambda x: f"${x/1000:.0f}K"),
+                                       textposition="outside"))
+            fig_evo2.add_trace(go.Scatter(name="FOB", x=evo["id"], y=evo["fob"],
+                                           mode="lines+markers",
+                                           line=dict(color=GOLD, width=2)))
+            fig_evo2.update_layout(title="FOB vs Total Landed por embarque (cronológico)",
+                                    xaxis_title="", yaxis_title="USD",
+                                    legend=dict(orientation="h", yanchor="top", y=-0.15,
+                                                xanchor="center", x=0.5))
+            st.plotly_chart(chart_layout(fig_evo2), use_container_width=True)
+    else:
+        st.info("Se necesitan al menos 2 embarques para mostrar la evolución.")
