@@ -57,12 +57,26 @@ st.markdown(f"""
   }}
   section[data-testid="stSidebar"] .stDateInput label,
   section[data-testid="stSidebar"] .stMultiSelect label,
-  section[data-testid="stSidebar"] .stSelectbox label {{
+  section[data-testid="stSidebar"] .stSelectbox label,
+  section[data-testid="stSidebar"] .stTextInput label,
+  section[data-testid="stSidebar"] .stSlider label {{
     color: {GOLD} !important;
     font-weight: 600;
     font-size: 0.78rem;
     letter-spacing: 0.05em;
     text-transform: uppercase;
+  }}
+
+  /* Input fields inside sidebar — texto negro para contraste */
+  section[data-testid="stSidebar"] input,
+  section[data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] *,
+  section[data-testid="stSidebar"] .stDateInput [data-baseweb="input"] *,
+  section[data-testid="stSidebar"] .stTextInput [data-baseweb="input"] * {{
+    color: #111111 !important;
+    background-color: #FFFFFF !important;
+  }}
+  section[data-testid="stSidebar"] [data-baseweb="select"] > div {{
+    background-color: #FFFFFF !important;
   }}
 
   /* KPI cards */
