@@ -545,42 +545,6 @@ if tab_sel == "Categoría":
                            xaxis_title="", yaxis_title="Unidades")
         st.plotly_chart(chart_layout(fig4), use_container_width=True)
 
-    # ── Semáforo de salud por categoría ──────────────────────────────────────
-    section("Semáforo de Salud por Categoría")
-    cat_health = []
-    for cat in sorted(df_all["categoria"].dropna().unique()):
-        sub = df_all[df_all["categoria"] == cat]
-        mg  = sub["margen"].mean() if len(sub) > 0 else 0
-        rot = sub["vendidas_30d"].sum() / sub["stock_act"].replace(0, float("nan")).sum() if sub["stock_act"].sum() > 0 else 0
-        alertas_cat = int((sub["stock_act"] <= sub["stock_min"]).sum())
-        # Score 0-6
-        s_mg  = 2 if mg >= 0.5 else (1 if mg >= 0.3 else 0)
-        s_rot = 2 if rot >= 0.3 else (1 if rot >= 0.1 else 0)
-        s_stk = 2 if alertas_cat == 0 else (1 if alertas_cat <= 1 else 0)
-        score = s_mg + s_rot + s_stk
-        color = GRN if score >= 5 else (ORG if score >= 3 else RED)
-        label = "Saludable" if score >= 5 else ("Atención" if score >= 3 else "Crítico")
-        cat_health.append({"cat": cat, "score": score, "color": color, "label": label,
-                           "margen": mg, "rotacion": rot, "alertas": alertas_cat, "skus": len(sub)})
-
-    cols_h = st.columns(len(cat_health), gap="small")
-    for col_, h in zip(cols_h, cat_health):
-        with col_:
-            st.markdown(f"""
-            <div style='background:{DARK};border-top:4px solid {h["color"]};
-                        border-radius:8px;padding:14px 10px;text-align:center;'>
-              <div style='font-size:0.65rem;color:#aaa;letter-spacing:0.08em;
-                          text-transform:uppercase;margin-bottom:4px;'>{h["cat"]}</div>
-              <div style='font-family:"Playfair Display",serif;font-size:1.5rem;
-                          color:{h["color"]};'>{h["score"]}/6</div>
-              <div style='font-size:0.7rem;color:{h["color"]};font-weight:600;
-                          margin:4px 0;'>{h["label"]}</div>
-              <div style='font-size:0.65rem;color:#888;line-height:1.6;'>
-                Margen {h["margen"]:.0%} · {h["skus"]} SKUs<br>
-                {"⚠ " + str(h["alertas"]) + " alertas" if h["alertas"] else "Stock OK"}
-              </div>
-            </div>""", unsafe_allow_html=True)
-
     # ── Tabla comparativa de categorías ──────────────────────────────────────
     section("Comparativa de Categorías")
     cat_comp = (df_all.groupby("categoria").agg(
