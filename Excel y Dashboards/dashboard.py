@@ -385,9 +385,12 @@ def chart_layout(fig, height=340):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Montserrat", color=DARK),
-        margin=dict(t=40, b=20, l=10, r=10),
+        margin=dict(t=48, b=48, l=10, r=10),
         height=height,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        title=dict(font=dict(size=13), x=0, xanchor="left", pad=dict(l=4)),
+        legend=dict(orientation="h", yanchor="top", y=-0.12,
+                    xanchor="center", x=0.5,
+                    font=dict(size=11)),
     )
     fig.update_xaxes(showgrid=False, zeroline=False)
     fig.update_yaxes(showgrid=True, gridcolor="#EEEEEE", zeroline=False)
@@ -467,6 +470,8 @@ if tab_sel == "Categoría":
                       title="Distribución del Valor de Inventario",
                       color_discrete_sequence=CHART_COLORS, hole=0.4)
         fig2.update_traces(textposition="inside", textinfo="percent+label")
+        fig2.update_layout(legend=dict(orientation="v", yanchor="middle", y=0.5,
+                                       xanchor="left", x=1.02))
         st.plotly_chart(chart_layout(fig2), use_container_width=True)
 
     # ── Charts row 2 ─────────────────────────────────────────────────────────
@@ -487,7 +492,9 @@ if tab_sel == "Categoría":
                                y=cat_stk["min_"], marker_color=RED,
                                opacity=0.75))
         fig3.update_layout(title="Stock Actual vs Mínimo por Categoría",
-                           barmode="group", xaxis_title="", yaxis_title="Unidades")
+                           barmode="group", xaxis_title="", yaxis_title="Unidades",
+                           legend=dict(orientation="h", yanchor="top", y=-0.15,
+                                       xanchor="center", x=0.5))
         st.plotly_chart(chart_layout(fig3), use_container_width=True)
 
     with c4:
@@ -595,7 +602,9 @@ elif tab_sel == "Productos":
                                 title="Margen vs Ventas 30d  (tamaño = valor inventario)",
                                 color_discrete_sequence=CHART_COLORS)
             fig_sc.update_layout(yaxis_tickformat=".0%", xaxis_title="Unidades vendidas 30d",
-                                 yaxis_title="Margen %")
+                                 yaxis_title="Margen %",
+                                 legend=dict(orientation="h", yanchor="top", y=-0.18,
+                                             xanchor="center", x=0.5, font=dict(size=10)))
             st.plotly_chart(chart_layout(fig_sc), use_container_width=True)
 
         # ── Charts row 2 ─────────────────────────────────────────────────────
@@ -613,7 +622,9 @@ elif tab_sel == "Productos":
                                      x=stk_prod["stock_min"], orientation="h",
                                      marker_color=RED, opacity=0.7))
             fig_stk.update_layout(title="Stock Actual vs Mínimo",
-                                  barmode="overlay", xaxis_title="Unidades", yaxis_title="")
+                                  barmode="overlay", xaxis_title="Unidades", yaxis_title="",
+                                  legend=dict(orientation="h", yanchor="top", y=-0.12,
+                                              xanchor="center", x=0.5))
             st.plotly_chart(chart_layout(fig_stk, height=max(320, n_res * 32 + 60)),
                             use_container_width=True)
 
@@ -706,7 +717,9 @@ elif tab_sel == "Logística":
                                 x=dl["id"], y=dl["total_costos"],
                                 marker_color=GOLD))
         fig_s.update_layout(title="FOB vs Costos de Importación (USD)",
-                             barmode="stack", xaxis_title="", yaxis_title="USD")
+                             barmode="stack", xaxis_title="", yaxis_title="USD",
+                             legend=dict(orientation="h", yanchor="top", y=-0.15,
+                                         xanchor="center", x=0.5))
         st.plotly_chart(chart_layout(fig_s), use_container_width=True)
 
     with c2l:
@@ -723,7 +736,10 @@ elif tab_sel == "Logística":
         fig_p = px.pie(cost_df, values="USD", names="Componente",
                        title="Composición de Costos",
                        color_discrete_sequence=CHART_COLORS, hole=0.35)
-        fig_p.update_traces(textposition="inside", textinfo="percent+label")
+        fig_p.update_traces(textposition="inside", textinfo="percent+label",
+                            textfont_size=10)
+        fig_p.update_layout(legend=dict(orientation="v", yanchor="middle", y=0.5,
+                                        xanchor="left", x=1.02, font=dict(size=10)))
         st.plotly_chart(chart_layout(fig_p, height=320), use_container_width=True)
 
     section("Eficiencia por Embarque")
