@@ -1,2 +1,5 @@
 .DS_Store
 skills/
+**/.streamlit/secrets.toml
+*.xlsx
+~$*
