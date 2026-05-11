@@ -300,7 +300,7 @@ with st.sidebar:
     <hr style='border-color:#333; margin: 0 0 20px;'>
     """, unsafe_allow_html=True)
 
-    tab_sel = st.radio("Sección", ["Categoría", "Productos", "Proveedores", "Reorden", "Logística"],
+    tab_sel = st.radio("Sección", ["Categoría", "Productos", "Proveedores", "Logística"],
                        label_visibility="collapsed")
 
     st.markdown("<hr style='border-color:#333; margin: 16px 0;'>", unsafe_allow_html=True)
@@ -338,19 +338,16 @@ with st.sidebar:
         prov_sel_p = st.selectbox("Proveedor", provs_p, key="prd_prov")
         est_p = ["Todos"] + sorted(prod_df["estado"].dropna().unique().tolist())
         est_sel_p = st.selectbox("Estado", est_p, key="prd_est")
+        st.markdown("**Reorden**")
+        dias_critico = st.slider("Días crítico", 5, 30, 15, key="ro_crit")
+        dias_revisar = st.slider("Días revisar", 15, 60, 30, key="ro_rev")
+        cats_ro = ["Todas"] + sorted(prod_df["categoria"].dropna().unique().tolist())
+        cat_sel_ro = cat_sel_p  # usa el mismo filtro de categoría
 
     elif tab_sel == "Proveedores":
         st.markdown("**Filtros**")
         est_pv = ["Todos"] + sorted(prod_df["estado"].dropna().unique().tolist())
         est_sel_pv = st.selectbox("Estado producto", est_pv, key="pv_est")
-
-    elif tab_sel == "Reorden":
-        st.markdown("**Umbrales**")
-        dias_critico = st.slider("Días crítico", 5, 30, 15)
-        dias_revisar = st.slider("Días revisar", 15, 60, 30)
-        st.markdown("**Filtros**")
-        cats_ro = ["Todas"] + sorted(prod_df["categoria"].dropna().unique().tolist())
-        cat_sel_ro = st.selectbox("Categoría", cats_ro, key="ro_cat")
 
     else:
         st.markdown("**Filtros**")
@@ -688,6 +685,66 @@ elif tab_sel == "Productos":
         export_button(dpf[show_cols].rename(columns=dict(zip(show_cols, disp.columns))),
                       "productos_filtrados.xlsx")
 
+        # ── Panel de Reorden ─────────────────────────────────────────────────
+        section("Panel de Reorden")
+        dro = dpf.copy()
+        dro["ventas_dia"] = dro["vendidas_30d"] / 30
+        dro["dias_stock"] = dro.apply(
+            lambda r: round(r["stock_act"] / r["ventas_dia"]) if r["ventas_dia"] > 0 else 999, axis=1)
+        dro["urgencia"] = dro["dias_stock"].apply(
+            lambda x: "SIN MOVIMIENTO" if x == 999
+            else ("CRÍTICO"  if x < dias_critico
+            else ("REVISAR"  if x < dias_revisar
+            else  "OK")))
+        dro["color_urg"] = dro["urgencia"].map(
+            {"CRÍTICO": RED, "REVISAR": ORG, "OK": GRN, "SIN MOVIMIENTO": GRAY})
+
+        criticos = int((dro["urgencia"] == "CRÍTICO").sum())
+        revisar  = int((dro["urgencia"] == "REVISAR").sum())
+        ok_      = int((dro["urgencia"] == "OK").sum())
+        sin_mov  = int((dro["urgencia"] == "SIN MOVIMIENTO").sum())
+
+        cr1, cr2, cr3, cr4 = st.columns(4, gap="small")
+        for col_, lbl_, val_, clr_ in [
+            (cr1, f"Crítico  (<{dias_critico}d)", str(criticos), "red"    if criticos else "green"),
+            (cr2, f"Revisar  (<{dias_revisar}d)", str(revisar),  "orange" if revisar  else "green"),
+            (cr3, "OK",                           str(ok_),      "green"),
+            (cr4, "Sin movimiento",               str(sin_mov),  ""),
+        ]:
+            with col_: st.markdown(kpi(lbl_, val_, clr_), unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        activos_ro = dro[dro["urgencia"] != "SIN MOVIMIENTO"].sort_values("dias_stock")
+        if len(activos_ro) > 0:
+            activos_ro = activos_ro.copy()
+            activos_ro["label"] = activos_ro["codigo"] + "  " + activos_ro["nombre"].str[:22]
+            activos_ro["dias_display"] = activos_ro["dias_stock"].clip(upper=90)
+            fig_ro = px.bar(activos_ro, x="dias_display", y="label", orientation="h",
+                            title="Días de Stock Restantes",
+                            color="color_urg", color_discrete_map="identity",
+                            text=activos_ro["dias_stock"].map(lambda x: f"{int(x)}d" if x < 90 else "90d+"))
+            fig_ro.update_traces(textposition="outside")
+            fig_ro.add_vline(x=dias_critico, line_dash="dash", line_color=RED,
+                             annotation_text=f"Crítico", annotation_position="top right")
+            fig_ro.add_vline(x=dias_revisar, line_dash="dash", line_color=ORG,
+                             annotation_text=f"Revisar", annotation_position="top right")
+            fig_ro.update_layout(showlegend=False, xaxis_title="Días de stock", yaxis_title="")
+            st.plotly_chart(chart_layout(fig_ro, height=max(300, len(activos_ro)*30+80)),
+                            use_container_width=True)
+
+        dro_disp = dro.sort_values("dias_stock")[
+            ["codigo","nombre","categoria","proveedor","stock_act","stock_min",
+             "vendidas_30d","dias_stock","urgencia","prox_orden"]].copy()
+        dro_disp.columns = ["Código","Nombre","Categoría","Proveedor","Stock","Mín.",
+                             "Ventas 30d","Días Stock","Urgencia","Próx. Orden"]
+        dro_disp["Días Stock"]  = dro_disp["Días Stock"].map(lambda x: "Sin mov." if x==999 else f"{int(x)}d")
+        dro_disp["Próx. Orden"] = pd.to_datetime(dro_disp["Próx. Orden"]).dt.strftime("%d/%m/%Y")
+        st.dataframe(dro_disp, use_container_width=True, hide_index=True,
+                     height=min(400, 38 + len(dro_disp)*35))
+        st.markdown("<br>", unsafe_allow_html=True)
+        export_button(dro_disp, "panel_reorden.xlsx")
+
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB — PROVEEDORES
 # ══════════════════════════════════════════════════════════════════════════════
@@ -794,86 +851,6 @@ elif tab_sel == "Proveedores":
     st.dataframe(disp_pv, use_container_width=True, hide_index=True)
     st.markdown("<br>", unsafe_allow_html=True)
     export_button(disp_pv, "proveedores.xlsx")
-
-# ══════════════════════════════════════════════════════════════════════════════
-# TAB — REORDEN
-# ══════════════════════════════════════════════════════════════════════════════
-elif tab_sel == "Reorden":
-    st.markdown('<div class="page-title">Panel de Reorden</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Días de stock restantes · Urgencia de compra · Próximas órdenes</div>', unsafe_allow_html=True)
-
-    dro = prod_df.copy()
-    if cat_sel_ro != "Todas": dro = dro[dro["categoria"] == cat_sel_ro]
-
-    dro["ventas_dia"] = dro["vendidas_30d"] / 30
-    dro["dias_stock"] = dro.apply(
-        lambda r: round(r["stock_act"] / r["ventas_dia"]) if r["ventas_dia"] > 0 else 999, axis=1)
-    dro["urgencia"] = dro["dias_stock"].apply(
-        lambda x: "SIN MOVIMIENTO" if x == 999
-        else ("CRÍTICO"   if x < dias_critico
-        else ("REVISAR"   if x < dias_revisar
-        else  "OK")))
-    dro["color_urg"] = dro["urgencia"].map(
-        {"CRÍTICO": RED, "REVISAR": ORG, "OK": GRN, "SIN MOVIMIENTO": GRAY})
-
-    criticos = int((dro["urgencia"] == "CRÍTICO").sum())
-    revisar  = int((dro["urgencia"] == "REVISAR").sum())
-    ok       = int((dro["urgencia"] == "OK").sum())
-    sin_mov  = int((dro["urgencia"] == "SIN MOVIMIENTO").sum())
-
-    # ── KPIs ─────────────────────────────────────────────────────────────────
-    cols_ro = st.columns(4, gap="small")
-    for col_, lbl_, val_, clr_ in [
-        (cols_ro[0], f"Crítico  (< {dias_critico}d)",    str(criticos), "red"   if criticos else "green"),
-        (cols_ro[1], f"Revisar  ({dias_critico}–{dias_revisar}d)", str(revisar),  "orange" if revisar  else "green"),
-        (cols_ro[2], "Stock OK",                          str(ok),       "green"),
-        (cols_ro[3], "Sin movimiento",                    str(sin_mov),  ""),
-    ]:
-        with col_: st.markdown(kpi(lbl_, val_, clr_), unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # ── Urgency chart ────────────────────────────────────────────────────────
-    section("Días de Stock por Producto")
-    activos_ro = dro[dro["urgencia"] != "SIN MOVIMIENTO"].sort_values("dias_stock")
-    if len(activos_ro) > 0:
-        activos_ro["label"] = activos_ro["codigo"] + "  " + activos_ro["nombre"].str[:22]
-        activos_ro["dias_display"] = activos_ro["dias_stock"].clip(upper=90)
-
-        fig_ro = px.bar(activos_ro, x="dias_display", y="label", orientation="h",
-                        title="Días de Stock Restantes (productos con movimiento)",
-                        color="color_urg", color_discrete_map="identity",
-                        text=activos_ro["dias_stock"].map(
-                            lambda x: f"{int(x)}d" if x < 90 else "90d+"))
-        fig_ro.update_traces(textposition="outside")
-        fig_ro.add_vline(x=dias_critico, line_dash="dash", line_color=RED,
-                         annotation_text=f"Crítico ({dias_critico}d)",
-                         annotation_position="top right")
-        fig_ro.add_vline(x=dias_revisar, line_dash="dash", line_color=ORG,
-                         annotation_text=f"Revisar ({dias_revisar}d)",
-                         annotation_position="top right")
-        fig_ro.update_layout(showlegend=False, xaxis_title="Días de stock",
-                             yaxis_title="")
-        st.plotly_chart(chart_layout(fig_ro, height=max(350, len(activos_ro)*30+80)),
-                        use_container_width=True)
-
-    # ── Reorder table ────────────────────────────────────────────────────────
-    section("Lista de Reorden Priorizada")
-    dro_disp = dro.sort_values("dias_stock")[
-        ["codigo","nombre","categoria","proveedor","stock_act","stock_min",
-         "vendidas_30d","dias_stock","urgencia","prox_orden","pvp"]
-    ].copy()
-    dro_disp.columns = ["Código","Nombre","Categoría","Proveedor","Stock Act.",
-                        "Stock Mín.","Ventas 30d","Días Stock","Urgencia",
-                        "Próx. Orden","PVP ARS"]
-    dro_disp["Días Stock"] = dro_disp["Días Stock"].map(
-        lambda x: "Sin movimiento" if x == 999 else f"{int(x)}d")
-    dro_disp["Próx. Orden"] = pd.to_datetime(dro_disp["Próx. Orden"]).dt.strftime("%d/%m/%Y")
-    dro_disp["PVP ARS"]     = dro_disp["PVP ARS"].map(lambda x: f"${x:,.0f}")
-    st.dataframe(dro_disp, use_container_width=True, hide_index=True,
-                 height=min(500, 38 + len(dro_disp)*35))
-    st.markdown("<br>", unsafe_allow_html=True)
-    export_button(dro_disp, "panel_reorden.xlsx")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB — LOGÍSTICA
