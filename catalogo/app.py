@@ -8,6 +8,28 @@ from pathlib import Path
 
 st.set_page_config(page_title="Catálogo de Productos", layout="wide", page_icon="🛍️")
 
+# ── Password protection ───────────────────────────────────────────────────────
+def check_password():
+    correct = st.secrets.get("PASSWORD", "")
+    if not correct:
+        return True  # No password configured, allow access
+
+    if st.session_state.get("authenticated"):
+        return True
+
+    st.markdown("## 🔒 Catálogo de Productos")
+    pwd = st.text_input("Contraseña", type="password")
+    if st.button("Entrar"):
+        if pwd == correct:
+            st.session_state["authenticated"] = True
+            st.rerun()
+        else:
+            st.error("Contraseña incorrecta.")
+    return False
+
+if not check_password():
+    st.stop()
+
 st.markdown("""
 <style>
     .stApp { background-color: #f5f5f5; }
