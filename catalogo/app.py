@@ -1,4 +1,5 @@
 import re
+import html
 import streamlit as st
 import pandas as pd
 import openpyxl
@@ -338,15 +339,30 @@ def process_excel(file_bytes: bytes, filename: str) -> pd.DataFrame:
 
     # Remove rows that have no code, no name AND no image (truly empty/footer rows)
     def is_valid(row):
-        has_img = row["_image"] is not None
-        has_code = "modelo" in row.index and pd.notna(row.get("modelo")) and str(row.get("modelo", "")).strip() not in ("", "nan")
-        has_name = "nombre" in row.index and pd.notna(row.get("nombre")) and str(row.get("nombre", "")).strip() not in ("", "nan")
-        # Check any non-private column for content
-        has_any = any(
-            pd.notna(row[c]) and str(row[c]).strip() not in ("", "nan")
-            for c in row.index if not c.startswith("_")
-        )
-        return has_img or has_code or has_name or has_any
+        def scalar(v):
+            # Guard against a cell returning a Series when columns are still duped
+            if isinstance(v, pd.Series):
+                v = v.iloc[0] if len(v) else None
+            return v
+
+        has_img = scalar(row.get("_image")) is not None
+        for col in ["modelo", "nombre"]:
+            v = scalar(row.get(col))
+            try:
+                if pd.notna(v) and str(v).strip() not in ("", "nan"):
+                    return True
+            except (TypeError, ValueError):
+                pass
+        for c in row.index:
+            if c.startswith("_"):
+                continue
+            v = scalar(row[c])
+            try:
+                if pd.notna(v) and str(v).strip() not in ("", "nan"):
+                    return True
+            except (TypeError, ValueError):
+                pass
+        return has_img
 
     df = df[df.apply(is_valid, axis=1)].reset_index(drop=True)
 
@@ -381,47 +397,62 @@ def match_png_files(df: pd.DataFrame, png_files) -> pd.DataFrame:
 # ── Card renderer ─────────────────────────────────────────────────────────────
 
 def _safe_str(val) -> str:
-    if pd.isna(val) if not isinstance(val, str) else False:
-        return ""
+    """Safely convert a cell value (possibly a Series) to a clean string."""
+    if isinstance(val, pd.Series):
+        val = val.iloc[0] if len(val) else None
+    try:
+        if pd.isna(val):
+            return ""
+    except (TypeError, ValueError):
+        pass
     s = str(val).strip()
     return "" if s == "nan" else s
+
+
+def _esc(val) -> str:
+    """Safe string + HTML-escape for inserting into HTML templates."""
+    return html.escape(_safe_str(val))
+
+
+def _build_card_html(img_html: str, modelo: str, nombre: str,
+                     precio: str, meta: str) -> str:
+    """Build card HTML as a plain string to avoid f-string / markdown conflicts."""
+    parts = ['<div class="card">', img_html, '<div class="card-body">']
+    if modelo:
+        parts.append(f'<div class="card-sku">{modelo}</div>')
+    parts.append(f'<div class="card-name">{nombre}</div>')
+    if precio:
+        parts.append(f'<div class="card-price">{precio}</div>')
+    if meta:
+        parts.append(f'<div class="card-meta">{meta}</div>')
+    parts += ['</div>', '</div>']
+    return "".join(parts)
 
 
 def render_card(product: pd.Series, col, product_id: str):
     with col:
         img = product.get("_image")
-        nombre = get_display_name(product)
-        modelo_str = _safe_str(product.get("modelo", ""))
-        precio = product.get("precio")
-        precio_str = f"¥ {float(precio):,.0f}" if pd.notna(precio) and precio != "" else ""
-        talla_str = _safe_str(product.get("talla", ""))
-        material_str = _safe_str(product.get("material", ""))
+        nombre   = _esc(get_display_name(product))
+        modelo   = _esc(product.get("modelo", ""))
+        precio_v = product.get("precio")
+        try:
+            precio = f"¥ {float(precio_v):,.0f}" if pd.notna(precio_v) and precio_v != "" else ""
+        except (TypeError, ValueError):
+            precio = ""
+        talla    = _esc(product.get("talla", ""))
+        material = _esc(product.get("material", ""))
 
         if img is not None:
             b64 = pil_to_b64(img)
-            img_html = (
-                f'<img class="card-img" src="data:image/jpeg;base64,{b64}">'
-                if b64 else '<div class="card-no-img">📦</div>'
-            )
+            img_html = (f'<img class="card-img" src="data:image/jpeg;base64,{b64}">'
+                        if b64 else '<div class="card-no-img">📦</div>')
         else:
             img_html = '<div class="card-no-img">📦</div>'
 
-        meta_parts = [p for p in [talla_str, material_str] if p]
-        meta_html = " · ".join(meta_parts)
+        meta = " · ".join(p for p in [talla, material] if p)
+        st.markdown(_build_card_html(img_html, modelo, nombre, precio, meta),
+                    unsafe_allow_html=True)
 
-        st.markdown(f"""
-        <div class="card">
-            {img_html}
-            <div class="card-body">
-                {'<div class="card-sku">' + modelo_str + '</div>' if modelo_str else ''}
-                <div class="card-name">{nombre}</div>
-                {'<div class="card-price">' + precio_str + '</div>' if precio_str else ''}
-                {'<div class="card-meta">' + meta_html + '</div>' if meta_html else ''}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # Toggle detail panel — clicking again or clicking another card closes this one
         is_open = st.session_state.get("selected_product") == product_id
         btn_label = "✕ Cerrar" if is_open else "Ver detalles"
         if st.button(btn_label, key=f"btn_{product_id}", use_container_width=True):
@@ -430,14 +461,8 @@ def render_card(product: pd.Series, col, product_id: str):
 
 
 def render_detail_panel(product: pd.Series):
-    """Full-width detail panel shown below the row that contains the selected product."""
-    img = product.get("_image")
-    nombre = get_display_name(product)
-
-    st.markdown("""
-    <div style="background:#fff;border-radius:14px;padding:24px 28px;
-                box-shadow:0 4px 24px rgba(0,0,0,0.10);margin:4px 0 24px 0;">
-    """, unsafe_allow_html=True)
+    img    = product.get("_image")
+    nombre = _safe_str(get_display_name(product))
 
     left, right = st.columns([1, 2])
     with left:
@@ -446,26 +471,27 @@ def render_detail_panel(product: pd.Series):
             if b64:
                 st.markdown(
                     f'<img src="data:image/jpeg;base64,{b64}" '
-                    f'style="width:100%;border-radius:10px;">',
+                    f'style="width:100%;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,0.1);">',
                     unsafe_allow_html=True,
                 )
     with right:
         st.markdown(f"### {nombre}")
-        detail_cols = [c for c in product.index if not c.startswith("_")]
-        grid_items = ""
-        for dc in detail_cols:
-            val = product[dc]
-            if pd.notna(val) and str(val).strip() not in ("", "nan"):
+        items = []
+        for dc in [c for c in product.index if not c.startswith("_")]:
+            val = _safe_str(product[dc])
+            if val:
                 label = DISPLAY_LABELS.get(dc, dc.replace("_", " ").capitalize())
-                grid_items += f"""
-                <div class="detail-item">
-                    <div class="detail-label">{label}</div>
-                    <div class="detail-value">{val}</div>
-                </div>"""
-        if grid_items:
-            st.markdown(f'<div class="detail-grid">{grid_items}</div>', unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
+                items.append(
+                    f'<div class="detail-item">'
+                    f'<div class="detail-label">{html.escape(label)}</div>'
+                    f'<div class="detail-value">{html.escape(val)}</div>'
+                    f'</div>'
+                )
+        if items:
+            st.markdown(
+                '<div class="detail-grid">' + "".join(items) + "</div>",
+                unsafe_allow_html=True,
+            )
 
 
 # ── Password ──────────────────────────────────────────────────────────────────
@@ -520,10 +546,9 @@ def main():
 > Subí tus archivos Excel desde el panel izquierdo para comenzar.
 
 **Cómo usar:**
-- Subí uno o más packing lists en Excel
-- Cada archivo se convierte en una categoría
+- Subí uno o más packing lists en Excel — cada archivo es una categoría
 - Opcionalmente subí imágenes sueltas en PNG/JPG
-- Usá los filtros para navegar el catálogo
+- Usá los filtros para navegar; **Editar** para corregir datos manualmente
         """)
         return
 
@@ -547,6 +572,12 @@ def main():
     if png_files:
         all_products = match_png_files(all_products, png_files)
 
+    # Store editable copy in session state so edits persist across reruns
+    if "edited_products" not in st.session_state or st.session_state.get("_source_hash") != id(excel_files):
+        st.session_state["edited_products"] = all_products.copy()
+        st.session_state["_source_hash"] = id(excel_files)
+
+    all_products = st.session_state["edited_products"]
     categories = sorted(all_products["_category"].unique().tolist())
 
     with st.sidebar:
@@ -563,55 +594,86 @@ def main():
         st.metric("Total productos", len(all_products))
         st.metric("Categorías", len(categories))
 
-    # Apply filters
-    filtered = all_products.copy()
-    if sel_cats:
-        filtered = filtered[filtered["_category"].isin(sel_cats)]
+    tab_catalog, tab_edit = st.tabs(["Catálogo", "✏️ Editar datos"])
 
-    if search:
-        mask = pd.Series(False, index=filtered.index)
-        for col in ["nombre", "modelo", "material"]:
-            if col in filtered.columns:
-                mask |= filtered[col].astype(str).str.lower().str.contains(
-                    search.lower(), na=False
-                )
-        filtered = filtered[mask]
-
-    if price_range and "precio" in filtered.columns:
-        num_precio = pd.to_numeric(filtered["precio"], errors="coerce")
-        filtered = filtered[num_precio.isna() | num_precio.between(*price_range)]
-
-    if filtered.empty:
-        st.warning("No hay productos que coincidan con los filtros.")
-        return
-
-    COLS = 4
-    for cat in (sel_cats if sel_cats else categories):
-        cat_df = filtered[filtered["_category"] == cat]
-        if cat_df.empty:
-            continue
-
-        st.markdown(
-            f'<div class="section-title">{cat}'
-            f'<span class="section-count">{len(cat_df)} productos</span></div>',
-            unsafe_allow_html=True,
+    # ── Edit tab ──────────────────────────────────────────────────────────────
+    with tab_edit:
+        st.markdown("Editá directamente en la tabla. Los cambios se reflejan en el catálogo.")
+        edit_cols = [c for c in all_products.columns if not c.startswith("_")]
+        edited = st.data_editor(
+            all_products[edit_cols].copy(),
+            use_container_width=True,
+            num_rows="dynamic",
+            column_config={
+                "nombre":       st.column_config.TextColumn("Nombre"),
+                "modelo":       st.column_config.TextColumn("Código / SKU"),
+                "precio":       st.column_config.NumberColumn("Precio", format="¥%.0f"),
+                "talla":        st.column_config.TextColumn("Medida"),
+                "material":     st.column_config.TextColumn("Material"),
+                "cantidad":     st.column_config.NumberColumn("Cantidad"),
+                "total":        st.column_config.NumberColumn("Total", format="¥%.0f"),
+                "observaciones":st.column_config.TextColumn("Observaciones"),
+                "_category":    st.column_config.TextColumn("Categoría"),
+            },
+            key="data_editor",
         )
+        if st.button("💾 Guardar cambios", type="primary"):
+            # Merge edited text columns back, keeping private cols (_image etc.)
+            for c in edit_cols:
+                if c in all_products.columns:
+                    st.session_state["edited_products"][c] = edited[c].values
+            st.success("Cambios guardados.")
+            st.rerun()
 
+    # ── Catalog tab ───────────────────────────────────────────────────────────
+    with tab_catalog:
+        # Apply filters
+        filtered = all_products.copy()
+        if sel_cats:
+            filtered = filtered[filtered["_category"].isin(sel_cats)]
+
+        if search:
+            mask = pd.Series(False, index=filtered.index)
+            for col in ["nombre", "modelo", "material"]:
+                if col in filtered.columns:
+                    mask |= filtered[col].astype(str).str.lower().str.contains(
+                        search.lower(), na=False
+                    )
+            filtered = filtered[mask]
+
+        if price_range and "precio" in filtered.columns:
+            num_precio = pd.to_numeric(filtered["precio"], errors="coerce")
+            filtered = filtered[num_precio.isna() | num_precio.between(*price_range)]
+
+        if filtered.empty:
+            st.warning("No hay productos que coincidan con los filtros.")
+            return
+
+        COLS = 4
         selected_id = st.session_state.get("selected_product")
-        rows = [cat_df.iloc[i : i + COLS] for i in range(0, len(cat_df), COLS)]
+        for cat in (sel_cats if sel_cats else categories):
+            cat_df = filtered[filtered["_category"] == cat]
+            if cat_df.empty:
+                continue
 
-        for row_group in rows:
-            cols = st.columns(COLS)
-            selected_in_row = None
-            for j, (idx, product) in enumerate(row_group.iterrows()):
-                pid = f"{cat}_{idx}"
-                render_card(product, cols[j], pid)
-                if selected_id == pid:
-                    selected_in_row = product
+            st.markdown(
+                f'<div class="section-title">{html.escape(cat)}'
+                f'<span class="section-count">{len(cat_df)} productos</span></div>',
+                unsafe_allow_html=True,
+            )
 
-            # Show detail panel full-width below this row if a card in it is selected
-            if selected_in_row is not None:
-                render_detail_panel(selected_in_row)
+            rows = [cat_df.iloc[i : i + COLS] for i in range(0, len(cat_df), COLS)]
+            for row_group in rows:
+                cols = st.columns(COLS)
+                selected_in_row = None
+                for j, (idx, product) in enumerate(row_group.iterrows()):
+                    pid = f"{cat}_{idx}"
+                    render_card(product, cols[j], pid)
+                    if selected_id == pid:
+                        selected_in_row = product
+
+                if selected_in_row is not None:
+                    render_detail_panel(selected_in_row)
 
 
 if __name__ == "__main__":
