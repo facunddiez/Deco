@@ -6,6 +6,34 @@ from pathlib import Path
 
 st.set_page_config(page_title="Catálogo", layout="wide", page_icon="🛍️")
 
+FOTOS_DIR = Path(__file__).parent / "fotos"
+IMG_EXTS   = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+
+
+@st.cache_data(show_spinner=False)
+def build_sku_image_map() -> dict[str, Path]:
+    """Scan FOTOS_DIR recursively, return {sku_stem: path}."""
+    mapping: dict[str, Path] = {}
+    if not FOTOS_DIR.exists():
+        return mapping
+    for p in FOTOS_DIR.rglob("*"):
+        if p.suffix.lower() in IMG_EXTS and not p.name.startswith("."):
+            mapping[p.stem.upper()] = p
+    return mapping
+
+
+def find_image(sku: str, img_map: dict[str, Path]) -> Path | None:
+    if not sku:
+        return None
+    key = sku.upper()
+    if key in img_map:
+        return img_map[key]
+    # Fallback: SKU variant suffix (e.g. EST-ARB-002-180 → EST-ARB-002)
+    parts = key.rsplit("-", 1)
+    if len(parts) == 2 and img_map.get(parts[0]):
+        return img_map[parts[0]]
+    return None
+
 # ── Styles ────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
@@ -157,26 +185,23 @@ def load_from_upload(files) -> list[pd.DataFrame]:
 
 
 # ── Card ──────────────────────────────────────────────────────────────────────
-def render_card(row: pd.Series, col, pid: str):
+def render_card(row: pd.Series, col, pid: str, img_map: dict):
     sku    = cell(row, "sku")
     nombre = cell(row, "nombre") or sku or "—"
     subcat = cell(row, "subcat") or cell(row, "cat")
-    img    = cell(row, "imagen1")
-
-    img_html = (
-        f'<img class="card-img" src="{html.escape(img)}" '
-        f'onerror="this.parentElement.innerHTML=\'<div class=card-no-img>📦</div>\'">'
-        if img else '<div class="card-no-img">📦</div>'
-    )
+    img_path = find_image(sku, img_map)
 
     with col:
+        if img_path:
+            st.image(str(img_path), use_container_width=True)
+        else:
+            st.markdown('<div class="card-no-img">📦</div>', unsafe_allow_html=True)
         st.markdown(
-            f'<div class="card">{img_html}'
             f'<div class="card-body">'
             f'<div class="card-sku">{html.escape(sku)}</div>'
             f'<div class="card-name">{html.escape(nombre)}</div>'
             f'<div class="card-cat">{html.escape(subcat)}</div>'
-            f'</div></div>',
+            f'</div>',
             unsafe_allow_html=True,
         )
         is_open = st.session_state.get("sel") == pid
@@ -187,7 +212,7 @@ def render_card(row: pd.Series, col, pid: str):
 
 
 # ── Detail panel ──────────────────────────────────────────────────────────────
-def render_detail(row: pd.Series):
+def render_detail(row: pd.Series, img_map: dict):
     sku    = cell(row, "sku")
     nombre = cell(row, "nombre") or sku or "—"
     desc   = cell(row, "desc")
@@ -197,17 +222,13 @@ def render_detail(row: pd.Series):
     prof   = cell(row, "prof")
     peso   = cell(row, "peso")
     stock  = cell(row, "stock")
-    imgs   = [u for u in [cell(row, "imagen1"), cell(row, "imagen2"), cell(row, "imagen3")] if u]
+    img_path = find_image(sku, img_map)
 
     left, right = st.columns([1, 2])
 
     with left:
-        if imgs:
-            st.image(imgs[0], use_container_width=True)
-            if len(imgs) > 1:
-                thumbs = st.columns(len(imgs) - 1)
-                for i, url in enumerate(imgs[1:]):
-                    thumbs[i].image(url, use_container_width=True)
+        if img_path:
+            st.image(str(img_path), use_container_width=True)
         else:
             st.markdown(
                 '<div style="height:220px;background:#f5f0ea;border-radius:10px;'
@@ -306,6 +327,8 @@ def main():
         if cat_col:
             st.metric("Categorías", df[cat_col].nunique())
 
+    img_map = build_sku_image_map()
+
     st.markdown("# Catálogo de Productos")
 
     # ── Filters ───────────────────────────────────────────────────────────────
@@ -348,13 +371,13 @@ def main():
 
             for j, (idx, product) in enumerate(chunk.iterrows()):
                 pid = f"{archivo}_{idx}"
-                render_card(product, cols[j], pid)
+                render_card(product, cols[j], pid, img_map)
                 if selected == pid:
                     detail_row = product
 
             if detail_row is not None:
                 st.markdown('<div class="detail-wrap">', unsafe_allow_html=True)
-                render_detail(detail_row)
+                render_detail(detail_row, img_map)
                 st.markdown("</div>", unsafe_allow_html=True)
 
 
